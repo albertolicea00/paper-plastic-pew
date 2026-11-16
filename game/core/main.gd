@@ -6,7 +6,8 @@ extends Node
 ##   --mode=<mode> --dimension=<id> --arena=<id> --bots=<n>   start a match directly
 ##   --touch                      show touch controls on desktop
 ##   --autopilot                  let the test pilot play
-##   --capture=<file.png>         save a frame after --capture-after seconds (default 4) and quit
+##   --capture=<file.png>         save a frame after --capture-after seconds (default 4) and quit;
+##                                without --mode it captures the menu
 
 const SAVE = "user://save.cfg"
 var dimensions: Dimensions
@@ -31,13 +32,13 @@ func _ready() -> void:
 			best[mode] = save.get_value("best", mode, 0)
 	if options.has("smoke"):
 		add_child(Smoke.new())
-	elif options.has("mode") or options.has("capture"):
-		start({"mode": options.get("mode", "survival"), "dimension": options.get("dimension", dimensions.active.id), "arena": options.get("arena", ""),
+	elif options.has("mode"):
+		start({"mode": options.mode, "dimension": options.get("dimension", dimensions.active.id), "arena": options.get("arena", ""),
 			"bots": int(options.get("bots", "4")), "autopilot": options.has("autopilot") or options.has("capture")})
-		if options.has("capture"):
-			_capture()
 	else:
 		show_menu()
+	if options.has("capture"):
+		_capture()
 
 func _clear() -> void:
 	if is_instance_valid(game):
