@@ -1,0 +1,46 @@
+# Local agent/planning workspace
+.workspace/
+
+# Godot 4
+**/.godot/
+**/export_credentials.cfg
+*.translation
+.mono/
+data_*/
+
+# Builds & exports
+builds/**
+!builds/.gitkeep
+*.apk
+*.aab
+*.ipa
+*.pck
+*.exe
+*.app/
+*.dmg
+
+# Signing & secrets
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+.env
+.env.*
+
+# Android / Gradle (if custom builds are enabled)
+**/android/build/
+**/.gradle/
+
+# Tooling / scripts
+__pycache__/
+.venv/
+.pytest_cache/
+node_modules/
+
+# OS & Editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
