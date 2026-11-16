@@ -1,0 +1,97 @@
+PAPER, PLASTIC, PEW!
+Credits and third-party licences
+================================
+
+The game's code, shaders and procedural art are original to this project.
+The third-party material listed below is used under the licence stated for
+each item. Paths are relative to the game/ folder.
+
+ENGINE
+------
+Godot Engine, by Juan Linietsky, Ariel Manzur and the Godot Engine
+contributors. MIT licence. https://godotengine.org/license
+
+FONTS
+-----
+All fonts are licensed under the SIL Open Font License, Version 1.1. The full
+licence text for each font is in font-OFL.txt beside the font file.
+
+dimensions/anime/font.ttf
+  Title:   Russo One (RussoOne-Regular.ttf)
+  Author:  Copyright (c) 2011-2012, Jovanny Lemonad (jovanny.ru), with
+           Reserved Font Name "Russo"
+  Licence: SIL Open Font License 1.1
+  Source:  https://github.com/google/fonts/tree/main/ofl/russoone
+
+dimensions/cartoon/font.ttf
+  Title:   Bangers (Bangers-Regular.ttf)
+  Author:  Copyright 2010 The Bangers Project Authors
+           (https://github.com/googlefonts/bangers)
+  Licence: SIL Open Font License 1.1
+  Source:  https://github.com/google/fonts/tree/main/ofl/bangers
+
+dimensions/clay/font.ttf
+  Title:   Lilita One (LilitaOne-Regular.ttf)
+  Author:  Copyright (c) 2011 Juan Montoreano (juan@remolacha.biz), with
+           Reserved Font Name Lilita
+  Licence: SIL Open Font License 1.1
+  Source:  https://github.com/google/fonts/tree/main/ofl/lilitaone
+
+SOUND EFFECTS
+-------------
+All sound effects are by Kenney (www.kenney.nl) and released under Creative
+Commons Zero (CC0 1.0, public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+Some files were trimmed, faded, level-adjusted or converted to mono WAV.
+game/assets/audio/SOURCES.md maps every file to its original.
+
+Sci-Fi Sounds (1.0), Kenney, CC0
+  https://kenney.nl/assets/sci-fi-sounds
+  assets/audio/shot.ogg, rapid.wav, scatter.wav, launch.wav, enemy_shot.wav,
+  boss_shot.ogg, explosion.ogg, die.wav, shift.wav
+  dimensions/clay/audio/die.ogg
+
+Digital Audio, Kenney, CC0
+  https://kenney.nl/assets/digital-audio
+  assets/audio/dash.wav, pickup.ogg, wave.wav, clear.wav, boss.wav, win.wav,
+  lose.wav
+
+Impact Sounds, Kenney, CC0
+  https://kenney.nl/assets/impact-sounds
+  assets/audio/hit.ogg, hurt.ogg
+  dimensions/clay/audio/hit.wav
+
+Interface Sounds, Kenney, CC0
+  https://kenney.nl/assets/interface-sounds
+  assets/audio/swap.ogg
+
+MUSIC
+-----
+All music was published on OpenGameArt.org under Creative Commons Zero
+(CC0 1.0): https://creativecommons.org/publicdomain/zero/1.0/
+The files are the authors' original OGG Vorbis files, unmodified.
+
+dimensions/anime/audio/music.ogg
+  Title:   "Action3 - Preparing For Battle", from JRPG Pack 5 Action
+           (JRPG Music Pack #5 [Action])
+  Author:  Juhani Junkala (published by SubspaceAudio)
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/jrpg-pack-5-action
+
+dimensions/cartoon/audio/music.ogg
+  Title:   Carnival Rides
+  Author:  Écrivain
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/carnival-rides
+
+dimensions/clay/audio/music.ogg
+  Title:   Where was I?
+  Author:  yd
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/where-was-i
+
+assets/audio/music.ogg (default for packs without their own music)
+  Title:   Summer Park - 8bit tune (loop)
+  Author:  Scribe (Daniel Stephens)
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/summer-park-8bit-tune-loop
