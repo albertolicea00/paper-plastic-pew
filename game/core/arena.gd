@@ -26,7 +26,8 @@ func build(spec: Dictionary) -> void:
 			if (x + z) % 2 == 0:
 				_mesh(tile, Vector3(-size.x * 0.5 + 2 + x * 4, 0.01, -size.y * 0.5 + 2 + z * 4), "floor", "floor_alt")
 	for side in [-1, 1]:
-		_block(Vector3(0, 0, side * (size.y * 0.5 + 0.5)), Vector3(size.x + 2, WALL_HEIGHT, 1), "wall", "wall", "box")
+		# The wall nearest the camera stays low so it never hides the player.
+		_block(Vector3(0, 0, side * (size.y * 0.5 + 0.5)), Vector3(size.x + 2, WALL_HEIGHT if side < 0 else 1.2, 1), "wall", "wall", "box")
 		_block(Vector3(side * (size.x * 0.5 + 0.5), 0, 0), Vector3(1, WALL_HEIGHT, size.y), "wall", "wall", "box")
 	for block in spec.get("blocks", []):
 		var role: String = block.get("role", "wall")
