@@ -68,6 +68,14 @@ func silence() -> void:
 	_deck = 1 - _deck
 	decks[_deck].stream = null
 
+## Release every stream, so a headless run can quit without leaked resources.
+func stop_all() -> void:
+	for player in voices + decks:
+		player.stop()
+		player.stream = null
+	cache.clear()
+	_playing = ""
+
 func _process(delta: float) -> void:
 	for i in 2:
 		var target = linear_to_db(maxf(0.0001, music_volume)) if i == _deck and decks[i].stream != null else -80.0

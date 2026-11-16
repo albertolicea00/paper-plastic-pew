@@ -81,5 +81,6 @@ func run() -> void:
 	check(is_instance_valid(main.menu), "menu did not open")
 	if failures.is_empty():
 		print("SMOKE PASS: %d dimensions, %d shift kills, %d skirmish kills" % [dimensions.packs.size(), shift_kills, skirmish_kills])
+	main.sfx.stop_all()
 	await get_tree().create_timer(0.2).timeout
 	get_tree().quit(1 if not failures.is_empty() else 0)
