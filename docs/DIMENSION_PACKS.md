@@ -103,6 +103,16 @@ The HUD layout is fixed. `hud` changes panel corner `radius`, `border` width, dr
 
 `feel.hitstop` is the freeze in seconds when the player scores a kill (bosses triple it). `feel.shake` multiplies camera shake.
 
+## Desk object
+
+The main menu is a workbench with one object per pack. The optional `desk` block picks it:
+
+```json
+"desk": {"object": "sketchbook", "cover": "@wall", "pages": "@floor", "art": "@prop", "accent": "@ui_accent", "scale": 1.0}
+```
+
+`object` is one of `sketchbook comic book sheets box figure lump blocks`; colours are palette keys. Without the block the menu picks an object from `family` (Paper: book-like, Plastic: sculpted). The object is drawn with the pack's own materials.
+
 ## Sound
 
 Events: `shot scatter rapid launch enemy_shot boss_shot explosion hit hurt die dash swap pickup wave clear boss shift win lose music`. A file in the pack's `audio/` folder overrides `game/assets/audio/` for that event while the dimension is active. `music` loops and crossfades on a shift.

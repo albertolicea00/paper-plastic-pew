@@ -24,5 +24,6 @@
 	"overlay": {"shader": "overlay.gdshader", "params": {"ink": "@ink", "paper": "#fffdf5", "strength": 0.9, "vignette": 0.5, "grain": 0.035}},
 	"animator": "animator.gd",
 	"hud": {"radius": 0, "border": 4, "shadow": 6, "tilt": 2.5, "uppercase": true, "font_scale": 1.0},
-	"feel": {"hitstop": 0.07, "shake": 1.35}
+	"feel": {"hitstop": 0.07, "shake": 1.35},
+	"desk": {"object": "sketchbook", "cover": "@wall", "pages": "@floor", "art": "@prop", "accent": "@ui_accent"}
 }

@@ -8,6 +8,7 @@ extends Node
 ##   --autopilot                  let the test pilot play
 ##   --capture=<file.png>         save a frame after --capture-after seconds (default 4) and quit;
 ##                                without --mode it captures the menu
+##   --menu-pick=<id> --menu-mode=<mode> --menu-start   preselect in the menu; see ui/menu.gd
 
 const SAVE = "user://save.cfg"
 var dimensions: Dimensions
