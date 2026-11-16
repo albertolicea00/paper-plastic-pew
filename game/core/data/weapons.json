@@ -1,0 +1,9 @@
+{
+	"blaster": {"name": "Blaster", "damage": 12, "rate": 5.0, "speed": 30, "spread": 2, "pellets": 1, "range": 30, "sound": "shot"},
+	"scatter": {"name": "Scatter", "damage": 9, "rate": 1.4, "speed": 28, "spread": 16, "pellets": 7, "range": 14, "sound": "scatter", "pickup": 18},
+	"rapid": {"name": "Rapid", "damage": 7, "rate": 13.0, "speed": 34, "spread": 6, "pellets": 1, "range": 26, "sound": "rapid", "pickup": 120},
+	"launcher": {"name": "Launcher", "damage": 70, "rate": 0.9, "speed": 17, "spread": 1, "pellets": 1, "range": 30, "splash": 3.2, "size": 2.2, "sound": "launch", "pickup": 8},
+	"enemy_shot": {"name": "Enemy shot", "damage": 8, "rate": 0.9, "speed": 12, "spread": 5, "pellets": 1, "range": 22, "sound": "enemy_shot"},
+	"enemy_scatter": {"name": "Enemy scatter", "damage": 7, "rate": 0.5, "speed": 11, "spread": 20, "pellets": 5, "range": 16, "sound": "scatter"},
+	"boss_ring": {"name": "Boss ring", "damage": 10, "rate": 1.0, "speed": 9, "spread": 0, "pellets": 1, "range": 30, "size": 1.5, "sound": "boss_shot"}
+}

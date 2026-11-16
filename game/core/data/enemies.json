@@ -1,0 +1,8 @@
+{
+	"player": {"name": "Player", "health": 100, "speed": 7.5, "behavior": "player", "weapon": "blaster", "look": {"color": "player", "accent": "player_accent"}},
+	"grunt": {"name": "Grunt", "health": 30, "speed": 3.4, "behavior": "ranged", "weapon": "enemy_shot", "range": 9, "score": 10, "cost": 1, "look": {"color": "grunt"}},
+	"runner": {"name": "Runner", "health": 18, "speed": 6.2, "behavior": "melee", "weapon": "", "touch": 10, "score": 15, "cost": 1, "look": {"color": "runner", "build": "runner", "scale": 0.85, "weapon": false}},
+	"tank": {"name": "Tank", "health": 150, "speed": 2.1, "behavior": "ranged", "weapon": "enemy_scatter", "range": 7, "score": 40, "cost": 3, "look": {"color": "tank", "build": "tank", "scale": 1.35}},
+	"boss": {"name": "Boss", "health": 900, "speed": 2.6, "behavior": "boss", "weapon": "boss_ring", "touch": 20, "score": 500, "cost": 0, "look": {"color": "boss", "accent": "player_accent", "build": "boss", "scale": 2.3}},
+	"bot": {"name": "Bot", "health": 100, "speed": 6.4, "behavior": "ranged", "weapon": "blaster", "range": 10, "score": 0, "cost": 0, "look": {"color": "bot", "accent": "player_accent"}}
+}
