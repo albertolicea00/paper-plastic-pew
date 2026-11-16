@@ -1,8 +1,25 @@
 {
 	"id": "cartoon", "name": "Cartoon / Comic", "family": "Paper", "order": 2,
 	"tagline": "Bold lines, halftone and bounce",
-	"palette": {"bg": "#2b1d5a", "floor": "#ffd166", "floor_alt": "#f7b955", "wall": "#118ab2", "prop": "#ef476f", "ui_bg": "#2b1d5a", "ui_accent": "#ffd166"},
-	"outline": {"width": 0.06, "color": "@ink"},
-	"hud": {"radius": 18, "border": 5, "shadow": 6, "tilt": 3.0, "uppercase": true},
-	"feel": {"hitstop": 0.0, "shake": 1.0}
+	"palette": {
+		"bg": "#1b1464", "floor": "#fff2c9", "floor_alt": "#ffdd7a", "wall": "#12b5a6", "prop": "#ff9a2e",
+		"player": "#2b5cff", "player_accent": "#ffe01a", "grunt": "#ff3b24", "runner": "#ff2d95",
+		"tank": "#8b3dff", "boss": "#b3001e", "bot": "#2fc750", "weapon": "#3a3554", "ink": "#140f2b",
+		"bullet_player": "#6ff6ff", "bullet_enemy": "#ff1f5a", "pickup_health": "#3ddc5b", "pickup_ammo": "#2f9bff",
+		"flash": "#fff7d6", "ui_bg": "#3320b5", "ui_fg": "#ffffff", "ui_accent": "#ffe01a", "ui_danger": "#ff2d4f"
+	},
+	"environment": {"ambient": "#a89cdc", "ambient_energy": 1.0, "light": "#fff6a0", "light_energy": 0.048, "light_pitch": -56, "light_yaw": -38, "shadows": true},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {"edge": 0.2, "band": 0.24, "dots": 96.0, "gloss": 0.965, "shine": 0.55},
+	"roles": {
+		"floor": {"shader": "floor.gdshader", "params": {"tint": "#ffc57a", "density": 2.6, "dot_max": 0.25, "dot_min": 0.1}},
+		"weapon": {"outline_width": 0.04},
+		"bullet": {"outline_width": 0.2, "params": {"glow": 0.85, "shine": 0.9, "gloss": 0.93}},
+		"pickup": {"outline_width": 0.07, "params": {"glow": 0.35}}
+	},
+	"outline": {"width": 0.06, "color": "@ink", "shader": "outline.gdshader", "params": {"wobble": 0.3}},
+	"overlay": {"shader": "overlay.gdshader", "params": {"ink": "@ink", "tint": "#2a1a8c", "pop": "@ui_accent", "pop_dots": "#ff5a3c", "strength": 0.65, "dots": 44.0, "frame": 0.008}},
+	"animator": "animator.gd",
+	"hud": {"radius": 16, "border": 5, "shadow": 7, "tilt": 3.0, "uppercase": true, "font_scale": 1.05},
+	"feel": {"hitstop": 0.06, "shake": 1.25}
 }
