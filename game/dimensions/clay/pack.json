@@ -1,7 +1,28 @@
 {
 	"id": "clay", "name": "Clay / Plasticine", "family": "Plastic", "order": 3,
 	"tagline": "Hand-sculpted stop motion",
-	"palette": {"bg": "#3b2f2a", "floor": "#b9a48c", "floor_alt": "#a8937b", "wall": "#6d8a6a", "prop": "#c96f4a", "ui_bg": "#4a3b34", "ui_accent": "#f2c14e"},
-	"hud": {"radius": 22, "border": 0, "shadow": 3, "tilt": 0.0},
-	"feel": {"hitstop": 0.0, "shake": 0.7}
+	"palette": {
+		"bg": "#2b211d", "floor": "#a39078", "floor_alt": "#8b7963", "wall": "#3f5660", "prop": "#6e4a36",
+		"player": "#2f7fd6", "player_accent": "#f6d24a", "grunt": "#d8442e", "runner": "#eea11f",
+		"tank": "#7d4aa8", "boss": "#a01f45", "bot": "#6fae3a", "weapon": "#37303c", "ink": "#2a1f1c",
+		"bullet_player": "#4fe8ff", "bullet_enemy": "#ff3f7a", "pickup_health": "#5fd06a", "pickup_ammo": "#45c6e0",
+		"flash": "#fff4dc", "ui_bg": "#4a3b34", "ui_fg": "#fff4e2", "ui_accent": "#f2c14e", "ui_danger": "#e5534b"
+	},
+	"environment": {"ambient": "#fff0e4", "ambient_energy": 0.42, "light": "#fff2dd", "light_energy": 0.62, "light_pitch": -54, "light_yaw": -32, "shadows": true},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {"wrap": 0.45, "sheen": 0.22, "warmth": "#ee7a52"},
+	"roles": {
+		"floor": {"shader": "floor.gdshader", "params": {"sheen": 0.12}},
+		"wall": {"params": {"boil": 0.0, "lump": 0.03, "dent_scale": 0.9}},
+		"prop": {"params": {"boil": 0.0, "lump": 0.03}},
+		"character": {"params": {"boil": 1.0, "lump": 0.018}},
+		"weapon": {"params": {"boil": 1.0, "lump": 0.01}},
+		"bullet": {"params": {"boil": 1.0, "lump": 0.04, "glow": 0.35, "bump": 0.4}},
+		"pickup": {"params": {"boil": 1.0, "lump": 0.02, "glow": 0.35}}
+	},
+	"outline": {"width": 0.0},
+	"overlay": {"shader": "overlay.gdshader", "params": {"vignette": 0.5, "grain": 0.05, "flicker": 0.03}},
+	"animator": "animator.gd",
+	"hud": {"radius": 22, "border": 0, "shadow": 3, "tilt": 0.0, "uppercase": false, "font_scale": 1.0},
+	"feel": {"hitstop": 0.0, "shake": 0.6}
 }
