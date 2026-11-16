@@ -13,6 +13,7 @@ var sheet: VBoxContainer
 var sheet_title: Label
 var sheet_body: Label
 var resume: Button
+var view_button: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -31,6 +32,7 @@ func _ready() -> void:
 	sheet_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sheet.add_child(sheet_body)
 	resume = _button("Resume", func(): game.set_paused(false))
+	view_button = _button("", _cycle_view)
 	_button("Restart", func(): game.main.start(game.config))
 	_button("Main menu", func(): game.main.show_menu())
 
@@ -41,6 +43,12 @@ func _button(text: String, action: Callable) -> Button:
 	button.pressed.connect(action)
 	sheet.add_child(button)
 	return button
+
+func _cycle_view() -> void:
+	var views = GameMatch.VIEWS
+	game.set_view(views[(views.find(game.view) + 1) % views.size()])
+	game.main.set_setting("view", game.view)
+	view_button.text = "View: " + GameMatch.VIEW_NAMES[game.view]
 
 func announce(text: String, sub: String = "", seconds: float = 1.6) -> void:
 	banner = text
@@ -58,6 +66,8 @@ func show_sheet(title: String, body: String) -> void:
 	sheet_body.text = body
 	sheet_body.visible = body != ""
 	resume.visible = not game.over
+	view_button.visible = not game.over
+	view_button.text = "View: " + GameMatch.VIEW_NAMES[game.view]
 	var font = _font()
 	sheet_title.add_theme_font_override("font", font)
 	sheet_title.add_theme_font_size_override("font_size", 64)
@@ -148,7 +158,7 @@ func _draw() -> void:
 	_text(Vector2(left + 14, top + 25), "%d" % ceilf(player.health), 20, fg, HORIZONTAL_ALIGNMENT_LEFT, 6)
 	_panel(Rect2(left, top + 46, 210, 44), pack.color("ui_bg"), -1.0)
 	var rounds: int = player.ammo.get(player.weapon_id, -1)
-	_text(Vector2(left + 14, top + 77), game.weapons[player.weapon_id].name, 22, accent)
+	_text(Vector2(left + 14, top + 77), pack.label(player.weapon_id, game.weapons[player.weapon_id].name), 22, accent)
 	_text(Vector2(left + 196, top + 77), "INF" if rounds < 0 else str(rounds), 22, fg, HORIZONTAL_ALIGNMENT_RIGHT)
 	_bar(Rect2(left, top + 98, 120, 14), 1.0 - player.dash_wait / Player.DASH_COOLDOWN, accent)
 	# Mode status, top centre.
@@ -172,6 +182,12 @@ func _draw() -> void:
 	if game.shifting:
 		var warn = director.shift_timer < 3.0
 		_text(Vector2(middle, top + 112), "Shift in %d" % ceilf(director.shift_timer) if warn else pack.title, 30 if warn else 20, accent if warn else fg, HORIZONTAL_ALIGNMENT_CENTER, 8)
+	# Behind and weapon views aim down the middle of the screen.
+	if game.view != "top" and player.alive and not sheet.visible:
+		var centre = size * 0.5
+		for arm in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
+			draw_line(centre + arm * 7.0, centre + arm * 19.0, pack.color("ink"), 6.0, true)
+			draw_line(centre + arm * 8.0, centre + arm * 18.0, accent, 3.0, true)
 	# Announcement banner.
 	if banner_left > 0.0 and not sheet.visible:
 		var age = banner_span - banner_left

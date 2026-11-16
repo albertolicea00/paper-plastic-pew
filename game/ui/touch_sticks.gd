@@ -8,6 +8,8 @@ const RADIUS = 80.0
 const FIRE_AT = 0.3
 var move = Vector2.ZERO
 var aim = Vector2.ZERO
+# Unnormalised right stick, for views that turn with it instead of pointing.
+var aim_raw = Vector2.ZERO
 var firing = false
 # One entry per stick: finger index, where it went down, where the thumb is.
 var sticks = [{"finger": -1, "origin": Vector2.ZERO, "thumb": Vector2.ZERO}, {"finger": -1, "origin": Vector2.ZERO, "thumb": Vector2.ZERO}]
@@ -81,6 +83,7 @@ func _read() -> void:
 	for stick in sticks:
 		values.append((stick.thumb - stick.origin) / RADIUS if stick.finger >= 0 else Vector2.ZERO)
 	move = values[0]
+	aim_raw = values[1]
 	firing = values[1].length() > FIRE_AT
 	if values[1].length() > 0.12:
 		aim = values[1].normalized()

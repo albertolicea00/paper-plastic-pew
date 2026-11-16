@@ -29,7 +29,11 @@ func think(delta: float) -> void:
 	else:
 		var input = game.input
 		move = Vector3(input.move.x, 0, input.move.y)
-		if input.aim.length_squared() > 0.01:
+		if game.view != "top":
+			# Behind and weapon views: turn with the look input, move relative to facing.
+			aim = aim.rotated(Vector3.UP, -input.take_look())
+			move = aim * -input.move.y + aim.rotated(Vector3.UP, -PI * 0.5) * input.move.x
+		elif input.aim.length_squared() > 0.01:
 			aim = Vector3(input.aim.x, 0, input.aim.y).normalized()
 		elif move.length_squared() > 0.04 and input.device != "mouse":
 			aim = move.normalized()

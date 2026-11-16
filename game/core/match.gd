@@ -6,6 +6,10 @@ extends Node3D
 const PLAYER_TEAM = 1
 const ENEMY_TEAM = 2
 const CAMERA_OFFSET = Vector3(0, 21, 12)
+# Camera views, chosen in the options: from above, behind the character, from the weapon.
+const VIEWS = ["top", "shoulder", "weapon"]
+const VIEW_NAMES = {"top": "Top-down", "shoulder": "Behind", "weapon": "Weapon"}
+const VIEW_FOV = {"top": 45.0, "shoulder": 62.0, "weapon": 74.0}
 const WARM_ROLES = ["floor", "wall", "prop", "character", "weapon", "bullet", "pickup", "flash"]
 const DATA = "res://core/data/"
 
@@ -35,7 +39,8 @@ var hud: Hud
 var world: WorldEnvironment
 var sun: DirectionalLight3D
 var actors: Array[Actor] = []
-var pickups: Array[MeshInstance3D] = []
+var pickups: Array[Node3D] = []
+var view = "top"
 var focus = Vector3.ZERO
 
 static func read(file: String) -> Dictionary:
@@ -61,11 +66,16 @@ func _ready() -> void:
 	add_child(sun)
 	arena = Arena.new()
 	add_child(arena)
-	arena.build(arenas.get(config.get("arena", ""), arenas[arenas.keys().pick_random()]))
+	# A dimension's own arenas are used when the whole match stays in it.
+	var own: Dictionary = dimensions.active.arenas
+	var pool = own if not own.is_empty() and not shifting and config.get("mode", "") != "campaign" else arenas
+	var wanted: String = config.get("arena", "")
+	arena.build(own.get(wanted, arenas.get(wanted, pool[pool.keys().pick_random()])))
 	projectiles = Projectiles.new()
 	vfx = Vfx.new()
 	camera = Camera3D.new()
-	camera.fov = 45.0
+	camera.near = 0.1
+	camera.far = 150.0
 	camera.position = CAMERA_OFFSET
 	add_child(camera)
 	camera.look_at(Vector3.ZERO)
@@ -99,6 +109,7 @@ func _ready() -> void:
 	sfx.music()
 	Input.emulate_mouse_from_touch = false
 	playing = true
+	set_view(config.get("view", main.settings.get("view", "top")))
 	director.start()
 
 func spawn(kind: String, at: Vector3, team: int) -> Actor:
@@ -148,26 +159,60 @@ func _on_died(actor: Actor, killer: Actor) -> void:
 			drop(actor.global_position, "health" if roll < 0.09 else ["scatter", "rapid", "launcher"].pick_random())
 	director.on_death(actor, killer)
 
+func set_view(next: String) -> void:
+	view = next if next in VIEWS else "top"
+	camera.fov = VIEW_FOV[view]
+	player.rig.set_first_person(view == "weapon")
+	_update_mouse()
+
+# Views that turn with the mouse need it captured while the fight is on.
+func _update_mouse() -> void:
+	var grab = playing and view != "top" and not autopilot and input.device == "mouse"
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if grab else Input.MOUSE_MODE_VISIBLE
+
+func _place_camera() -> void:
+	var at = player.global_position
+	var aim = player.aim
+	match view:
+		"shoulder":
+			var head = at + Vector3(0, 1.5, 0)
+			var seat = head - aim * 5.0 + Vector3(0, 1.7, 0) + aim.rotated(Vector3.UP, -PI * 0.5) * 0.7
+			# Walls push the camera in instead of hiding the character.
+			var hit = get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(head, seat, 1))
+			if not hit.is_empty():
+				seat = hit.position + (head - seat).normalized() * 0.3
+			camera.position = seat
+			camera.look_at(at + aim * 6.0 + Vector3(0, 1.0, 0))
+		"weapon":
+			camera.position = at + Vector3(0, 1.3, 0) - aim * 0.25
+			camera.look_at(camera.position + aim)
+		_:
+			camera.position = focus + CAMERA_OFFSET
+			camera.look_at(focus)
+	camera.position += vfx.camera_offset() * (0.25 if view != "top" else 1.0)
+
 func drop(at: Vector3, what: String) -> void:
-	var node = MeshInstance3D.new()
-	var mesh = BoxMesh.new()
-	mesh.size = Vector3.ONE * 0.55
-	node.mesh = mesh
+	var node = Node3D.new()
+	dimensions.active.builder.pickup(node, what)
 	node.position = arena.clamp_inside(at) + Vector3(0, 0.6, 0)
 	node.set_meta("what", what)
 	node.set_meta("life", 14.0)
 	add_child(node)
-	dimensions.style(node, "pickup", "pickup_health" if what == "health" else "pickup_ammo")
 	pickups.append(node)
 
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("pause") and not over:
 		set_paused(not paused)
+	if Input.is_action_just_pressed("view") and playing:
+		set_view(VIEWS[(VIEWS.find(view) + 1) % VIEWS.size()])
+		main.set_setting("view", view)
+		hud.announce(VIEW_NAMES[view], "", 1.0)
 	if not playing:
 		return
+	_update_mouse()
 	var lead = player.aim * 2.0 if player.alive else Vector3.ZERO
 	focus = focus.lerp(arena.clamp_inside(player.global_position + lead, 3.0), 1.0 - exp(-delta * 6.0))
-	camera.position = focus + CAMERA_OFFSET + vfx.camera_offset()
+	_place_camera()
 	for node in pickups.duplicate():
 		node.rotation.y += delta * 2.5
 		node.position.y = 0.6 + sin(node.rotation.y * 1.3) * 0.12
@@ -181,7 +226,7 @@ func _process(delta: float) -> void:
 				player.heal(30.0)
 			else:
 				player.grant(what)
-				hud.announce(weapons[what].name, "", 1.0)
+				hud.announce(dimensions.active.label(what, weapons[what].name), "", 1.0)
 			sfx.play("pickup")
 			vfx.burst(node.position, "pickup_health" if what == "health" else "pickup_ammo", 10, 5.0)
 		if taken or life <= 0.0:
@@ -193,6 +238,7 @@ func set_paused(value: bool) -> void:
 	playing = not value
 	touch.reset()
 	Input.emulate_mouse_from_touch = value
+	_update_mouse()
 	hud.show_sheet("Paused" if value else "", "")
 
 func end(won: bool) -> void:
@@ -204,6 +250,7 @@ func end(won: bool) -> void:
 	touch.reset()
 	Engine.time_scale = time_scale
 	Input.emulate_mouse_from_touch = true
+	_update_mouse()
 	sfx.play("win" if won else "lose")
 	main.record(config.get("mode", "survival"), score)
 	hud.show_sheet("Victory!" if won else "Game over", director.summary())
@@ -214,6 +261,10 @@ func _on_shift(pack: DimensionPack) -> void:
 	sfx.play("shift")
 	sfx.music()
 	hud.announce(pack.title, pack.tagline, 2.2)
+	for node in pickups:
+		for child in node.get_children():
+			child.free()
+		pack.builder.pickup(node, node.get_meta("what"))
 
 func _apply_environment(pack: DimensionPack) -> void:
 	var settings = pack.environment
@@ -264,3 +315,4 @@ func _warm_up() -> void:
 func _exit_tree() -> void:
 	Engine.time_scale = 1.0
 	Input.emulate_mouse_from_touch = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

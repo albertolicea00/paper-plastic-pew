@@ -5,6 +5,7 @@ extends Node
 ##   --smoke                      headless gameplay check, see core/smoke.gd
 ##   --mode=<mode> --dimension=<id> --arena=<id> --bots=<n>   start a match directly
 ##   --touch                      show touch controls on desktop
+##   --view=top|shoulder|weapon   camera view for this run
 ##   --autopilot                  let the test pilot play
 ##   --capture=<file.png>         save a frame after --capture-after seconds (default 4) and quit;
 ##                                without --mode it captures the menu
@@ -17,6 +18,8 @@ var menu: MainMenu
 var game: GameMatch
 var options: Dictionary = {}
 var best: Dictionary = {}
+# Player options, kept between runs. view: top | shoulder | weapon
+var settings: Dictionary = {"view": "top"}
 
 func _ready() -> void:
 	for argument in OS.get_cmdline_user_args():
@@ -31,6 +34,8 @@ func _ready() -> void:
 	if save.load(SAVE) == OK:
 		for mode in save.get_section_keys("best"):
 			best[mode] = save.get_value("best", mode, 0)
+		for key in settings.keys():
+			settings[key] = save.get_value("settings", key, settings[key])
 	if options.has("smoke"):
 		add_child(Smoke.new())
 	elif options.has("mode"):
@@ -62,6 +67,8 @@ func start(config: Dictionary) -> void:
 	var full = config.duplicate()
 	if options.has("touch") or OS.has_feature("mobile"):
 		full["touch"] = true
+	if options.has("view"):
+		full["view"] = options.view
 	game = GameMatch.new()
 	game.setup(self, full)
 	add_child(game)
@@ -70,9 +77,19 @@ func record(mode: String, score: int) -> void:
 	if options.has("smoke") or score <= best.get(mode, 0):
 		return
 	best[mode] = score
+	_save()
+
+func set_setting(key: String, value) -> void:
+	settings[key] = value
+	if not options.has("smoke"):
+		_save()
+
+func _save() -> void:
 	var save = ConfigFile.new()
 	for key in best:
 		save.set_value("best", key, best[key])
+	for key in settings:
+		save.set_value("settings", key, settings[key])
 	save.save(SAVE)
 
 func _capture() -> void:
