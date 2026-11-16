@@ -1,8 +1,28 @@
 {
 	"id": "anime", "name": "Anime / Manga", "family": "Paper", "order": 1,
 	"tagline": "Ink, speed lines and impact frames",
-	"palette": {"bg": "#101018", "floor": "#e9e6df", "floor_alt": "#d9d5cc", "wall": "#3a3d52", "prop": "#e0637a", "ui_bg": "#14141c", "ui_accent": "#ff3b5c"},
-	"outline": {"width": 0.035, "color": "@ink"},
-	"hud": {"radius": 2, "border": 3, "shadow": 5, "tilt": 2.0, "uppercase": true},
-	"feel": {"hitstop": 0.05, "shake": 1.3}
+	"palette": {
+		"bg": "#16151f", "floor": "#f1ecdf", "floor_alt": "#dcd5c3", "wall": "#3b4268", "prop": "#f08a24",
+		"player": "#1e7bff", "player_accent": "#ffd60a", "grunt": "#e63946", "runner": "#ff7a1a",
+		"tank": "#7d3fc8", "boss": "#a3123a", "bot": "#14b37d", "weapon": "#2a2c3a", "ink": "#12121a",
+		"bullet_player": "#12c4ff", "bullet_enemy": "#ff2d6f", "pickup_health": "#2fd16b", "pickup_ammo": "#ffc400",
+		"flash": "#ffffff", "ui_bg": "#14141c", "ui_fg": "#fffdf5", "ui_accent": "#ffd60a", "ui_danger": "#ff2d55"
+	},
+	"environment": {"ambient": "#ffffff", "ambient_energy": 0.5, "light": "#ffffff", "light_energy": 1.0, "light_pitch": -56, "light_yaw": -32, "shadows": true},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {"shade": "#8f86d6", "tone_ink": "@ink", "bands": 3.0, "mid": 0.62, "tone": 0.3, "tone_scale": 6.0},
+	"roles": {
+		"floor": {"shader": "floor.gdshader", "params": {"ink": "@ink", "shade": "#b9b2e6"}},
+		"wall": {"params": {"world_tone": 1.0, "tone_scale": 2.2, "tone": 0.55}, "outline_width": 0.05},
+		"prop": {"params": {"world_tone": 1.0, "tone_scale": 3.0, "tone": 0.4}, "outline_width": 0.045},
+		"character": {"params": {"spec": 0.9, "rim": 0.25}, "outline_width": 0.04},
+		"weapon": {"params": {"tone": 0.0}, "outline_width": 0.03},
+		"pickup": {"params": {"tone": 0.0, "shade": "#c9c2f0"}, "outline_width": 0.05},
+		"bullet": {"shader": "bullet.gdshader", "params": {"ink": "@ink"}}
+	},
+	"outline": {"width": 0.04, "color": "@ink", "shader": "outline.gdshader", "params": {"weight": 0.45}},
+	"overlay": {"shader": "overlay.gdshader", "params": {"ink": "@ink", "paper": "#fffdf5", "strength": 0.9, "vignette": 0.5, "grain": 0.035}},
+	"animator": "animator.gd",
+	"hud": {"radius": 0, "border": 4, "shadow": 6, "tilt": 2.5, "uppercase": true, "font_scale": 1.0},
+	"feel": {"hitstop": 0.07, "shake": 1.35}
 }
