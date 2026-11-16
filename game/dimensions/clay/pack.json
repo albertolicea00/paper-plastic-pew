@@ -1,0 +1,7 @@
+{
+	"id": "clay", "name": "Clay / Plasticine", "family": "Plastic", "order": 3,
+	"tagline": "Hand-sculpted stop motion",
+	"palette": {"bg": "#3b2f2a", "floor": "#b9a48c", "floor_alt": "#a8937b", "wall": "#6d8a6a", "prop": "#c96f4a", "ui_bg": "#4a3b34", "ui_accent": "#f2c14e"},
+	"hud": {"radius": 22, "border": 0, "shadow": 3, "tilt": 0.0},
+	"feel": {"hitstop": 0.0, "shake": 0.7}
+}

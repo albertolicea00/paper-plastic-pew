@@ -1,0 +1,8 @@
+{
+	"id": "anime", "name": "Anime / Manga", "family": "Paper", "order": 1,
+	"tagline": "Ink, speed lines and impact frames",
+	"palette": {"bg": "#101018", "floor": "#e9e6df", "floor_alt": "#d9d5cc", "wall": "#3a3d52", "prop": "#e0637a", "ui_bg": "#14141c", "ui_accent": "#ff3b5c"},
+	"outline": {"width": 0.035, "color": "@ink"},
+	"hud": {"radius": 2, "border": 3, "shadow": 5, "tilt": 2.0, "uppercase": true},
+	"feel": {"hitstop": 0.05, "shake": 1.3}
+}

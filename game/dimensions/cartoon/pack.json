@@ -1,0 +1,8 @@
+{
+	"id": "cartoon", "name": "Cartoon / Comic", "family": "Paper", "order": 2,
+	"tagline": "Bold lines, halftone and bounce",
+	"palette": {"bg": "#2b1d5a", "floor": "#ffd166", "floor_alt": "#f7b955", "wall": "#118ab2", "prop": "#ef476f", "ui_bg": "#2b1d5a", "ui_accent": "#ffd166"},
+	"outline": {"width": 0.06, "color": "@ink"},
+	"hud": {"radius": 18, "border": 5, "shadow": 6, "tilt": 3.0, "uppercase": true},
+	"feel": {"hitstop": 0.0, "shake": 1.0}
+}
