@@ -78,4 +78,8 @@ func _capture() -> void:
 	await get_tree().create_timer(float(options.get("capture-after", "4"))).timeout
 	await RenderingServer.frame_post_draw
 	get_viewport().get_texture().get_image().save_png(options.capture)
+	# Free the scene and audio first, or Godot reports leaked resources at exit.
+	_clear()
+	sfx.stop_all()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()
