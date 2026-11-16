@@ -2,7 +2,23 @@
 
 A multiverse top-down twin-stick shooter where arenas, art direction, and character animation shift across a growing roster of **Paper** and **Plastic** visual dimensions.
 
-> **Status:** Concept & Pre-Development
+> **Status:** Playable vertical slice on desktop. Three dimensions (Anime / Manga, Cartoon / Comic, Clay / Plasticine), four modes and real-time dimension shifts work. Not yet played on a phone; Android and iOS exports are configured but unbuilt.
+
+## Run
+
+Install Godot 4.6.3 and run from the repository root:
+
+```sh
+make run      # desktop: WASD or arrows to move, mouse to aim and fire, Space to dash, Q to swap weapon, Esc to pause
+make touch    # same, with the dual touch sticks visible
+make shift    # straight into Multiverse Shift mode
+make check    # headless gameplay checks
+make help     # every target, including exports and captures
+```
+
+A gamepad works as a twin stick: left stick moves, right stick aims and fires.
+
+The Godot project lives in `game/`. `docs/ARCHITECTURE.md` explains the structure and `docs/DIMENSION_PACKS.md` how to add a dimension. Third-party audio and fonts are listed in `CREDITS.txt`.
 
 ## Why Paper, Plastic, Pew!?
 
