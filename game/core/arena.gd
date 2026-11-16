@@ -8,6 +8,8 @@ var size = Vector2(40, 28)
 var spawns: Array[Vector3] = []
 var player_start = Vector3.ZERO
 var title = ""
+var blocks: Array[Dictionary] = []
+var scenery: Node3D
 
 func build(spec: Dictionary) -> void:
 	title = spec.get("name", "Arena")
@@ -31,7 +33,22 @@ func build(spec: Dictionary) -> void:
 		_block(Vector3(side * (size.x * 0.5 + 0.5), 0, 0), Vector3(1, WALL_HEIGHT, size.y), "wall", "wall", "box")
 	for block in spec.get("blocks", []):
 		var role: String = block.get("role", "wall")
-		_block(Vector3(block.at[0], 0, block.at[1]), Vector3(block.size[0], block.size[1], block.size[2]), role, block.get("color", role), block.get("shape", "box"))
+		_block(Vector3(block.at[0], 0, block.at[1]), Vector3(block.size[0], block.size[1], block.size[2]), role, block.get("color", role), block.get("shape", "box"), true)
+	scenery = Node3D.new()
+	add_child(scenery)
+	add_to_group(Dimensions.REBUILT)
+	rebuild()
+
+## Dress the shared layout in the active dimension's shapes.
+func rebuild() -> void:
+	var builder = Dimensions.hub.active.builder
+	for block in blocks:
+		for child in block.holder.get_children():
+			child.free()
+		builder.block(block.holder, block.extent, block.shape, block.role, block.color)
+	for child in scenery.get_children():
+		child.free()
+	builder.decorate(scenery, self)
 
 func _mesh(mesh: Mesh, at: Vector3, role: String, color_key: String) -> MeshInstance3D:
 	var node = MeshInstance3D.new()
@@ -41,36 +58,33 @@ func _mesh(mesh: Mesh, at: Vector3, role: String, color_key: String) -> MeshInst
 	Dimensions.hub.style(node, role, color_key)
 	return node
 
-func _block(at: Vector3, extent: Vector3, role: String, color_key: String, shape: String) -> void:
+func _block(at: Vector3, extent: Vector3, role: String, color_key: String, shape: String, dressed: bool = false) -> void:
 	var body = StaticBody3D.new()
 	body.position = at + Vector3(0, extent.y * 0.5, 0)
 	body.collision_layer = 1
 	body.collision_mask = 0
 	add_child(body)
 	var collider = CollisionShape3D.new()
-	var mesh: Mesh
 	if shape == "cylinder":
-		var round_mesh = CylinderMesh.new()
-		round_mesh.top_radius = extent.x * 0.5
-		round_mesh.bottom_radius = extent.x * 0.5
-		round_mesh.height = extent.y
-		mesh = round_mesh
 		var round_shape = CylinderShape3D.new()
 		round_shape.radius = extent.x * 0.5
 		round_shape.height = extent.y
 		collider.shape = round_shape
 	else:
-		var box_mesh = BoxMesh.new()
-		box_mesh.size = extent
-		mesh = box_mesh
 		var box_shape = BoxShape3D.new()
 		box_shape.size = extent
 		collider.shape = box_shape
 	body.add_child(collider)
-	var node = MeshInstance3D.new()
-	node.mesh = mesh
-	body.add_child(node)
-	Dimensions.hub.style(node, role, color_key)
+	if dressed:
+		# Layout blocks get their look from the dimension builder.
+		var holder = Node3D.new()
+		holder.position = at
+		add_child(holder)
+		blocks.append({"holder": holder, "extent": extent, "shape": shape, "role": role, "color": color_key})
+	else:
+		var box_mesh = BoxMesh.new()
+		box_mesh.size = extent
+		_mesh(box_mesh, body.position, role, color_key)
 
 func clamp_inside(point: Vector3, margin: float = 1.0) -> Vector3:
 	return Vector3(clampf(point.x, -size.x * 0.5 + margin, size.x * 0.5 - margin), 0, clampf(point.z, -size.y * 0.5 + margin, size.y * 0.5 - margin))

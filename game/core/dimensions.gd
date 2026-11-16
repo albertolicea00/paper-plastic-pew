@@ -7,6 +7,8 @@ signal shifted(pack: DimensionPack)
 
 const ROOT = "res://dimensions"
 const GROUP = "styled"
+# Nodes whose shapes come from the pack builder; they implement rebuild().
+const REBUILT = "rebuilt"
 static var hub: Dimensions
 
 var packs: Array[DimensionPack] = []
@@ -47,6 +49,7 @@ func shift_to(id: String) -> void:
 	if next == active:
 		return
 	active = next
+	get_tree().call_group(REBUILT, "rebuild")
 	for node in get_tree().get_nodes_in_group(GROUP):
 		apply(node)
 	shifted.emit(active)

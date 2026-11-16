@@ -11,23 +11,23 @@ var meshes: Array[MultiMeshInstance3D] = []
 
 func _ready() -> void:
 	game = get_parent()
+	add_to_group(Dimensions.REBUILT)
 	for key in KEYS:
 		var node = MultiMeshInstance3D.new()
 		node.multimesh = MultiMesh.new()
 		node.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 		node.multimesh.instance_count = CAPACITY
 		node.multimesh.visible_instance_count = 0
-		var ball = SphereMesh.new()
-		ball.radius = 0.5
-		ball.height = 1.0
-		ball.radial_segments = 10
-		ball.rings = 5
-		node.multimesh.mesh = ball
+		node.multimesh.mesh = Dimensions.hub.active.builder.bullet_mesh()
 		node.custom_aabb = AABB(Vector3(-100, -5, -100), Vector3(200, 10, 200))
 		node.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		add_child(node)
 		Dimensions.hub.style(node, "bullet", key)
 		meshes.append(node)
+
+func rebuild() -> void:
+	for node in meshes:
+		node.multimesh.mesh = Dimensions.hub.active.builder.bullet_mesh()
 
 func spawn(origin: Vector3, heading: Vector3, weapon: Dictionary, shooter: Actor) -> void:
 	if shots.size() >= CAPACITY:
@@ -85,7 +85,8 @@ func _process(_delta: float) -> void:
 	for shot in shots:
 		var which: int = shot.hostile
 		var thickness: float = 0.26 * shot.size
-		var basis = Basis.looking_at(shot.heading, Vector3.UP).scaled(Vector3(thickness, thickness, thickness * 2.4))
+		# Scale in the bullet's own axes so it stretches along its flight.
+		var basis = Basis.looking_at(shot.heading, Vector3.UP) * Basis.from_scale(Vector3(thickness, thickness, thickness * 2.4))
 		meshes[which].multimesh.set_instance_transform(counts[which], Transform3D(basis, shot.at))
 		counts[which] += 1
 	for which in 2:

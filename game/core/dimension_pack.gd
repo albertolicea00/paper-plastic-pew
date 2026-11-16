@@ -25,6 +25,8 @@ var family = ""
 var tagline = ""
 var order = 0
 var animator: DimensionAnimator
+var builder: DimensionBuilder
+var arenas: Dictionary = {}
 var overlay: ShaderMaterial
 var font: Font
 var environment: Dictionary = {}
@@ -57,6 +59,13 @@ static func load_from(pack_dir: String) -> DimensionPack:
 	pack.feel = _merged(FEEL, parsed.get("feel", {}))
 	var script = pack._resource(parsed.get("animator", ""))
 	pack.animator = script.new() if script is GDScript else DimensionAnimator.new()
+	var shapes = pack._resource(parsed.get("builder", ""))
+	pack.builder = shapes.new() if shapes is GDScript else DimensionBuilder.new()
+	# Optional arenas of its own, same format as core/data/arenas.json.
+	if FileAccess.file_exists(pack.path("arenas.json")):
+		var layouts = JSON.parse_string(FileAccess.get_file_as_string(pack.path("arenas.json")))
+		if layouts is Dictionary:
+			pack.arenas = layouts
 	var over: Dictionary = parsed.get("overlay", {})
 	var over_shader = pack._shader(over.get("shader", ""))
 	if over_shader != null:
@@ -78,6 +87,10 @@ static func _merged(base: Dictionary, extra: Dictionary) -> Dictionary:
 
 func color(key: String) -> Color:
 	return _colors.get(key, Color.MAGENTA)
+
+## This dimension's name for a weapon or character kind ("names" in pack.json).
+func label(key: String, fallback: String) -> String:
+	return data.get("names", {}).get(key, fallback)
 
 func path(file: String) -> String:
 	return file if file.begins_with("res://") else dir.path_join(file)

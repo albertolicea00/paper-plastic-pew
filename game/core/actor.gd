@@ -52,7 +52,7 @@ func setup(owner_game: GameMatch, actor_kind: String, actor_team: int) -> void:
 	add_child(collider)
 	rig = CharacterRig.new()
 	add_child(rig)
-	rig.build(look)
+	rig.build(look, kind)
 
 func think(_delta: float) -> void:
 	pass

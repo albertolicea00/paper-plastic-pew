@@ -1,13 +1,19 @@
 class_name CharacterRig
 extends Node3D
-## Procedural character made of named parts. Gameplay feeds the state fields;
-## the active dimension's animator turns them into a pose every frame.
-## Parts: body, head, visor, hand_l, hand_r, foot_l, foot_r, weapon (optional),
-## plus build extras (horn_l, horn_r). Forward is -Z.
+## Character made of named parts. The active dimension's builder decides the
+## shapes, its animator turns the state fields below into a pose every frame,
+## and a dimension shift rebuilds the parts in place.
+## Required parts: body, head, hand_l, hand_r, foot_l, foot_r, weapon
+## (optional). Forward is -Z.
 
+const FIRST_PERSON_PARTS = ["weapon", "hand_r"]
 var parts: Dictionary = {}
 var rest: Dictionary = {}
+var look: Dictionary = {}
+var kind = ""
 var base_scale = 1.0
+# First-person view shows only the weapon and the hand holding it.
+var first_person = false
 # Animation state, written by the owning actor.
 var clock = 0.0
 var phase = 0.0
@@ -22,67 +28,43 @@ var dead = false
 var variation = 0.0
 var _flash = 0.0
 
-func build(look: Dictionary) -> void:
+func build(character_look: Dictionary, character_kind: String) -> void:
+	look = character_look
+	kind = character_kind
 	base_scale = float(look.get("scale", 1.0))
 	variation = randf()
-	var tone: String = look.get("color", "grunt")
-	var accent: String = look.get("accent", "ink")
-	var shape: String = look.get("build", "biped")
-	var girth = {"biped": 0.32, "runner": 0.25, "tank": 0.5, "boss": 0.46}.get(shape, 0.32)
-	var body = CapsuleMesh.new()
-	body.radius = girth
-	body.height = 0.95 if shape != "runner" else 0.85
-	_part("body", body, Vector3(0, 0.72, 0), tone)
-	var head = SphereMesh.new()
-	head.radius = 0.34 if shape == "runner" else 0.24 if shape == "tank" else 0.29
-	head.height = head.radius * 2.0
-	_part("head", head, Vector3(0, 1.22 + head.radius, 0), tone)
-	var visor = BoxMesh.new()
-	visor.size = Vector3(head.radius * 1.3, head.radius * 0.42, head.radius * 0.5)
-	_part("visor", visor, Vector3(0, 1.24 + head.radius, -head.radius * 0.8), accent)
-	for side in [-1, 1]:
-		var tag = "l" if side < 0 else "r"
-		var hand: Mesh
-		if shape == "runner":
-			var claw = CylinderMesh.new()
-			claw.top_radius = 0.0
-			claw.bottom_radius = 0.1
-			claw.height = 0.5
-			hand = claw
-		else:
-			var fist = SphereMesh.new()
-			fist.radius = 0.12 * (1.5 if shape == "tank" else 1.0)
-			fist.height = fist.radius * 2.0
-			hand = fist
-		_part("hand_" + tag, hand, Vector3(side * (girth + 0.14), 0.82, -0.22), accent if shape == "runner" else tone)
-		if shape == "runner":
-			parts["hand_" + tag].rotation.x = -PI * 0.5
-			rest["hand_" + tag] = parts["hand_" + tag].transform
-		var foot = BoxMesh.new()
-		foot.size = Vector3(0.2, 0.14, 0.34)
-		_part("foot_" + tag, foot, Vector3(side * girth * 0.6, 0.07, -0.03), "ink")
-		if shape == "boss":
-			var horn = CylinderMesh.new()
-			horn.top_radius = 0.0
-			horn.bottom_radius = 0.09
-			horn.height = 0.4
-			_part("horn_" + tag, horn, Vector3(side * 0.2, 1.72, 0), accent)
-			parts["horn_" + tag].rotation.z = -side * 0.5
-			rest["horn_" + tag] = parts["horn_" + tag].transform
-	if look.get("weapon", true):
-		var gun = BoxMesh.new()
-		gun.size = Vector3(0.14, 0.16, 0.7) * (1.5 if shape in ["tank", "boss"] else 1.0)
-		_part("weapon", gun, Vector3(girth + 0.14, 0.86, -0.5), "weapon", "weapon")
+	add_to_group(Dimensions.REBUILT)
+	rebuild()
+
+## Throw the parts away and build them again with the active dimension.
+func rebuild() -> void:
+	for part in parts.values():
+		part.free()
+	parts.clear()
+	rest.clear()
+	_flash = 0.0
+	Dimensions.hub.active.builder.character(self, look, kind)
+	# Rest poses are read after the builder returns, so it may adjust parts.
+	for part in parts:
+		rest[part] = parts[part].transform
+	set_first_person(first_person)
 	reset()
 
-func _part(part: String, mesh: Mesh, at: Vector3, color_key: String, role: String = "character") -> void:
+## Add a named part; builders call this. Returns the node for further tweaks.
+func add_part(part: String, mesh: Mesh, at: Vector3, color_key: String, role: String = "character", euler: Vector3 = Vector3.ZERO) -> MeshInstance3D:
 	var node = MeshInstance3D.new()
 	node.mesh = mesh
 	node.position = at
+	node.rotation = euler
 	add_child(node)
 	parts[part] = node
-	rest[part] = node.transform
 	Dimensions.hub.style(node, role, color_key)
+	return node
+
+func set_first_person(value: bool) -> void:
+	first_person = value
+	for part in parts:
+		parts[part].visible = not value or part in FIRST_PERSON_PARTS
 
 ## Back to the rest pose; animators call this first.
 func reset() -> void:

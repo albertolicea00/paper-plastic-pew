@@ -11,6 +11,8 @@ A pack changes how the game looks, moves, sounds and feels. It never changes col
 | `pack.json` | yes | Identity, palette, material setup, HUD theme, feel |
 | `*.gdshader` | no | Surface, outline and overlay shaders named in `pack.json` |
 | `animator.gd` | no | Animation language, extends `DimensionAnimator` |
+| `builder.gd` | no | Shapes of characters, props, pickups, bullets and scenery, extends `DimensionBuilder` |
+| `arenas.json` | no | Arenas of its own, used when a whole match stays in this dimension |
 | `font.ttf` / `font.otf` | no | HUD and menu font, found by name |
 | `audio/<event>.ogg` or `.wav` | no | Sound overrides, found by name |
 
@@ -34,6 +36,8 @@ A pack changes how the game looks, moves, sounds and feels. It never changes col
 	"outline": {"width": 0.035, "color": "@ink", "shader": "", "params": {}},
 	"overlay": {"shader": "overlay.gdshader", "params": {"strength": 0.5}},
 	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {"blaster": "Ink Brush", "grunt": "Sketch", "boss": "Editor-in-Chief"},
 	"hud": {"radius": 2, "border": 3, "shadow": 5, "tilt": 2.0, "uppercase": true, "font_scale": 1.0},
 	"feel": {"hitstop": 0.05, "shake": 1.3}
 }
@@ -96,6 +100,30 @@ func pose(rig: CharacterRig, time: float, phase: float) -> void:
 Rig state you can read: `clock` (seconds alive), `phase` (walk cycle angle), `speed_ratio` (0 to about 1), `move_local` (movement direction relative to facing; forward is -Z), `recoil`, `hurt`, `dash` (each 1 decaying to 0), `spawn` (0 rising to 1), `death` (0 rising to 1), `dead`, `variation` (random 0 to 1 per character).
 
 Parts: `body`, `head`, `visor`, `hand_l`, `hand_r`, `foot_l`, `foot_r`, and when present `weapon`, `horn_l`, `horn_r`. Helpers `rig.move(part, offset)`, `rig.turn(part, euler)` and `rig.stretch(part, factor)` ignore missing parts. The base class offers `walk()`, `lean()`, `kick()` and `life_scale()` to compose.
+
+## Builder: shapes of its own
+
+`builder.gd` extends `DimensionBuilder` (`game/core/dimension_builder.gd`) and decides what things are made of in this dimension. Override any of:
+
+| Function | Builds |
+| --- | --- |
+| `character(rig, look, kind)` | a character, with `rig.add_part(name, mesh, position, palette_key, role, euler)` |
+| `block(holder, extent, shape, role, color_key)` | the look of one arena block (wall or prop) |
+| `pickup(holder, what)` | a pickup: `health`, `scatter`, `rapid` or `launcher` |
+| `bullet_mesh()` | the bullet mesh (unit size, flies along -Z) |
+| `decorate(holder, arena)` | scenery without collision around the arena |
+
+Rules:
+
+- Shapes are visual only; collision is shared. A character fits a capsule of radius 0.45 and height 1.8 before `look.scale`; a block stays inside its `extent` footprint (height is free); scenery stays outside the playfield or flat on the floor.
+- Characters must have the parts `body`, `head`, `hand_l`, `hand_r`, `foot_l`, `foot_r`, plus `weapon` unless `look.weapon` is false. The weapon sits in the right hand and points along -Z: the weapon view shows only `weapon` and `hand_r`. Extra parts with any names are welcome, and the pack's own animator may move them.
+- `kind` is `player`, `grunt`, `runner`, `tank`, `boss` or `bot`. Give each a silhouette that reads at a glance from above, from behind and at eye level: the three camera views.
+- A shift rebuilds every shape on the same frame. Get meshes through `box()`, `sphere()`, `capsule()`, `cylinder()`, `cone()` or `shared(key, callable)`, which cache them; never create a new mesh per call. Add nodes with `add(parent, mesh, position, role, palette_key, euler)`.
+- Keep no reference to the pack in the builder; use `Dimensions.hub.active` if you need it.
+
+`names` in `pack.json` renames weapons (`blaster scatter rapid launcher`) for the HUD.
+
+`arenas.json` uses the format of `game/core/data/arenas.json`. Survival and skirmish pick from it; Multiverse Shift and Campaign use the shared arenas because the layout must be the same in every dimension.
 
 ## HUD theme and feel
 
