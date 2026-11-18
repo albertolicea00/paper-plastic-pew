@@ -18,7 +18,6 @@ const MODES = [
 	["campaign", "Campaign", "Stage and boss in every world, in order", true],
 	["skirmish", "Skirmish vs bots", "Free-for-all against AI in one world", false]]
 const LEVELS = ["Easy", "Normal", "Hard"]
-const VIEWS = [["top", "Top"], ["shoulder", "Behind"], ["weapon", "Weapon"]]
 const SIDE = 404.0
 const EDGE = 16.0
 
@@ -44,8 +43,6 @@ var mode_buttons: Array[Button] = []
 var note: Label
 var level_buttons: Array[Button] = []
 var level_label: Label
-var view_buttons: Array[Button] = []
-var view_label: Label
 var info_buttons: Array[Button] = []
 var bots_row: HBoxContainer
 var bots_label: Label
@@ -152,15 +149,6 @@ func _build_side() -> void:
 		button.set_meta("row", true)
 		levels.add_child(button)
 		level_buttons.append(button)
-	var views = _row(column)
-	view_label = _label(views, HORIZONTAL_ALIGNMENT_LEFT)
-	view_label.custom_minimum_size = Vector2(92, 0)
-	for i in VIEWS.size():
-		var button = _button(VIEWS[i][1], func(): main.set_setting("view", VIEWS[i][0]))
-		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		button.set_meta("row", true)
-		views.add_child(button)
-		view_buttons.append(button)
 	map_row = _row(column)
 	var map_label = _label(map_row, HORIZONTAL_ALIGNMENT_LEFT)
 	map_label.custom_minimum_size = Vector2(92, 0)
@@ -383,10 +371,6 @@ func _refresh() -> void:
 	for i in LEVELS.size():
 		_skin(level_buttons[i], i == level, 18)
 		level_buttons[i].text = _case(LEVELS[i])
-	_write(view_label, "View", 16, fg, 92.0)
-	for i in VIEWS.size():
-		_skin(view_buttons[i], VIEWS[i][0] == main.settings.get("view", "top"), 18)
-		view_buttons[i].text = _case(VIEWS[i][1])
 	# Endless map is pointless for the stage-based campaign.
 	map_row.visible = MODES[mode][0] != "campaign"
 	_write(map_row.get_child(0), "Map", 16, fg, 92.0)
