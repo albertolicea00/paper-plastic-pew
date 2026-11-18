@@ -1,0 +1,148 @@
+{
+	"id": "pixel",
+	"name": "Pixel Art",
+	"family": "Paper",
+	"order": 5,
+	"tagline": "8-bit worlds, one chunky pixel at a time",
+	"palette": {
+		"bg": "#1a1726",
+		"floor": "#7fa93c",
+		"floor_alt": "#5f8a2a",
+		"wall": "#6b4a2f",
+		"prop": "#e07a3c",
+		"player": "#3b7dd8",
+		"player_accent": "#f7e26b",
+		"grunt": "#d14d4d",
+		"runner": "#c653c9",
+		"tank": "#7b6cd0",
+		"boss": "#e2344a",
+		"bot": "#f29b40",
+		"weapon": "#3a4256",
+		"ink": "#11131f",
+		"bullet_player": "#ffe66d",
+		"bullet_enemy": "#ff5277",
+		"pickup_health": "#ff4d6d",
+		"pickup_ammo": "#39d9c0",
+		"flash": "#ffffff",
+		"ui_bg": "#161228",
+		"ui_fg": "#f2f2f2",
+		"ui_accent": "#f7e26b",
+		"ui_danger": "#ff5277"
+	},
+	"environment": {
+		"ambient": "#dfe6ff",
+		"ambient_energy": 0.52,
+		"light": "#fff4d6",
+		"light_energy": 1.0,
+		"light_pitch": -58,
+		"light_yaw": -35,
+		"shadows": true
+	},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {
+		"levels": 4.0,
+		"shade_floor": 0.42,
+		"wrap": 0.08,
+		"pixel": 2.0,
+		"dither": 1.0,
+		"glow": 0.0,
+		"spark": 0.0
+	},
+	"roles": {
+		"floor": {
+			"shader": "floor.gdshader",
+			"params": {
+				"tile": 1.0,
+				"grid": 0.12,
+				"grid_shade": 0.18,
+				"jitter": 0.12,
+				"levels": 4.0,
+				"shade_floor": 0.46,
+				"pixel": 2.0
+			}
+		},
+		"wall": {
+			"params": {
+				"levels": 4.0
+			}
+		},
+		"prop": {
+			"params": {
+				"levels": 4.0
+			}
+		},
+		"character": {
+			"params": {
+				"levels": 4.0,
+				"spark": 0.25,
+				"spark_tight": 40.0
+			}
+		},
+		"weapon": {
+			"params": {
+				"levels": 4.0,
+				"spark": 0.35,
+				"spark_tight": 48.0
+			}
+		},
+		"bullet": {
+			"params": {
+				"glow": 0.85,
+				"spark": 0.0
+			}
+		},
+		"pickup": {
+			"params": {
+				"glow": 0.4,
+				"spark": 0.3
+			}
+		},
+		"fx": {
+			"params": {
+				"glow": 0.5
+			}
+		}
+	},
+	"outline": {
+		"width": 0.0
+	},
+	"overlay": {
+		"shader": "overlay.gdshader",
+		"params": {
+			"line_px": 3.0,
+			"scan": 0.22,
+			"stripe": 0.05,
+			"vignette": 0.5,
+			"line_tint": "#0a0b14",
+			"edge_tint": "#070610",
+			"flash_tint": "#eafbff",
+			"pulse_tint": "#ffe66d"
+		}
+	},
+	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {
+		"blaster": "Pixel Blaster",
+		"scatter": "Spread Gun",
+		"rapid": "Pulse Laser",
+		"launcher": "Mega Bomb"
+	},
+	"hud": {
+		"radius": 0,
+		"border": 3,
+		"shadow": 0,
+		"tilt": 0.0,
+		"uppercase": true,
+		"font_scale": 0.6
+	},
+	"feel": {
+		"hitstop": 0.04,
+		"shake": 1.15
+	},
+	"desk": {
+		"object": "box",
+		"cover": "@weapon",
+		"art": "@player",
+		"accent": "@player_accent"
+	}
+}
