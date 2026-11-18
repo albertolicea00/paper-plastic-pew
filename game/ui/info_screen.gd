@@ -182,26 +182,59 @@ func _draw_mouse(c: Control, at: Vector2, side: Vector2) -> void:
 	c.draw_line(at + Vector2(side.x * 0.5, 2), at + Vector2(side.x * 0.5, side.y * 0.42), ink, 3.0)
 	_center(c, "FIRE", at + Vector2(side.x * 0.5, side.y + 16), 14, pack.color("ui_fg"))
 
-# Real controller art from the Kenney Input Prompts pack (CC0), with the action
-# mapping as a legend beneath — the standard way a control screen reads.
-const XBOX_TEX = preload("res://assets/ui/controllers/xbox.png")
-const PS_TEX = preload("res://assets/ui/controllers/playstation.png")
+# Kenney Input Prompts glyphs (CC0): one icon per button, Xbox and PlayStation.
+const GLYPHS = "res://assets/ui/controllers/glyphs/"
+const STICK = preload(GLYPHS + "stick.png")
+const XA = preload(GLYPHS + "xbox_a.png")
+const XY = preload(GLYPHS + "xbox_y.png")
+const XLB = preload(GLYPHS + "xbox_lb.png")
+const XRB = preload(GLYPHS + "xbox_rb.png")
+const PCROSS = preload(GLYPHS + "ps_cross.png")
+const PTRI = preload(GLYPHS + "ps_triangle.png")
+const PL1 = preload(GLYPHS + "ps_l1.png")
+const PR1 = preload(GLYPHS + "ps_r1.png")
 
+# A button-by-button map: no controller drawing, just each input and its action.
+# Each row: action, Xbox glyph(s), PlayStation glyph(s). A null glyph draws a
+# lettered key cap instead (Start/Back have no icon in the set).
 func _draw_gamepad(c: Control, r: Rect2) -> void:
-	var s = minf(r.size.x * 0.40, 360.0)
-	var y = r.position.y + r.size.y * 0.42
-	_pad_image(c, XBOX_TEX, "XBOX", Vector2(r.position.x + r.size.x * 0.28, y), s)
-	_pad_image(c, PS_TEX, "PLAYSTATION", Vector2(r.position.x + r.size.x * 0.72, y), s)
-	var legend = r.position + Vector2(r.size.x * 0.5, r.size.y * 0.92)
-	_caption(c, legend + Vector2(0, -32), "LEFT STICK MOVE   ·   RIGHT STICK AIM & FIRE", pack.color("ui_accent"))
-	_caption(c, legend + Vector2(0, -8), "A / CROSS DASH   ·   Y / TRIANGLE SWAP   ·   BUMPERS HELP MOVE", Color(pack.color("ui_fg"), 0.85))
-	_caption(c, legend + Vector2(0, 16), "START PAUSE   ·   BACK / SHARE CHANGE VIEW", Color(pack.color("ui_fg"), 0.85))
+	var rows = [
+		["Move", [STICK], [STICK], "Left"],
+		["Aim & fire", [STICK], [STICK], "Right"],
+		["Dash", [XA, XLB], [PCROSS, PL1], ""],
+		["Swap weapon", [XY, XRB], [PTRI, PR1], ""],
+		["Pause", [], [], "Start"],
+		["Change view", [], [], "Back / Share"]]
+	var fg = pack.color("ui_fg")
+	var left = r.position.x + 40.0
+	var xbox_x = r.position.x + r.size.x * 0.56
+	var ps_x = r.position.x + r.size.x * 0.78
+	var top = r.position.y + 26.0
+	var step = (r.size.y - 60.0) / rows.size()
+	_center(c, "XBOX", Vector2(xbox_x + 40, top - 8), 15, pack.color("ui_accent"))
+	_center(c, "PLAYSTATION", Vector2(ps_x + 40, top - 8), 15, pack.color("ui_accent"))
+	for i in rows.size():
+		var row = rows[i]
+		var y = top + 30.0 + i * step
+		c.draw_string(_font(), Vector2(left, y + 8), _case(row[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, 24, fg)
+		if row[1].is_empty():
+			# No icon in the set for Start/Back: draw a lettered key cap spanning the columns.
+			_cap(c, Vector2(xbox_x, y - 17), Vector2(ps_x + 88 - xbox_x, 34), row[3])
+		else:
+			_glyphs(c, row[1], Vector2(xbox_x, y), fg)
+			_glyphs(c, row[2], Vector2(ps_x, y), fg)
+			# Which stick, captioned under the icon so it never crowds the action.
+			if row[3] != "":
+				_center(c, row[3], Vector2(xbox_x + 22, y + 34), 13, Color(fg, 0.8))
+				_center(c, row[3], Vector2(ps_x + 22, y + 34), 13, Color(fg, 0.8))
+		if i < rows.size() - 1:
+			c.draw_line(Vector2(left, y + step - 16), Vector2(r.position.x + r.size.x - 20, y + step - 16), Color(fg, 0.15), 2.0)
 
-# One controller illustration, centred, with its name above.
-func _pad_image(c: Control, tex: Texture2D, name: String, mid: Vector2, s: float) -> void:
-	_caption(c, mid + Vector2(0, -s * 0.5 - 16), name, pack.color("ui_fg"))
-	# Tint the white Kenney art to the theme's foreground so it shows on any page.
-	c.draw_texture_rect(tex, Rect2(mid - Vector2(s * 0.5, s * 0.5), Vector2(s, s)), false, pack.color("ui_fg"))
+# Draw a row of button icons, tinted to the theme, from a left anchor.
+func _glyphs(c: Control, icons: Array, at: Vector2, tint: Color) -> void:
+	var size = 44.0
+	for j in icons.size():
+		c.draw_texture_rect(icons[j], Rect2(at + Vector2(j * (size + 6), -size * 0.5), Vector2(size, size)), false, tint)
 
 func _stick(c: Control, at: Vector2, radius: float, label: String) -> void:
 	var ink = pack.color("ink")
