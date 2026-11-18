@@ -18,6 +18,8 @@ var scenery: Node3D
 var endless = false
 var ground: Node3D
 var chunks: Dictionary = {}
+# A fresh world every match, so the endless map is never the same layout twice.
+var world_seed = 0
 
 func build(spec: Dictionary) -> void:
 	title = spec.get("name", "Arena")
@@ -56,6 +58,7 @@ func _build_endless() -> void:
 	endless = true
 	title = "Endless " + Dimensions.hub.active.family
 	player_start = Vector3.ZERO
+	world_seed = randi()
 	ground = Node3D.new()
 	add_child(ground)
 	var span = CELL * (CELL_RADIUS * 2 + 3)
@@ -85,11 +88,22 @@ func stream(center: Vector3) -> void:
 		if absi(cell.x - here.x) > CELL_RADIUS + 1 or absi(cell.y - here.y) > CELL_RADIUS + 1:
 			_drop_chunk(cell)
 
-# Deterministic props for one cell: a couple of blocks, origin kept clear.
+# Props and a 7-unit checker for one cell. Seeded by cell AND the match's
+# world_seed, so the same spot differs every match. 7 divides CELL, so the
+# checker stays aligned as the follow-floor jumps in CELL steps.
 func _make_chunk(cell: Vector2i) -> void:
-	chunks[cell] = []
+	var chunk = {"props": [], "tiles": []}
+	chunks[cell] = chunk
+	# Checker tiles (floor_alt), two sub-tiles of the cell on average.
+	for sx in 2:
+		for sz in 2:
+			if (cell.x * 2 + sx + cell.y * 2 + sz) % 2 == 0:
+				var tile = PlaneMesh.new()
+				tile.size = Vector2(CELL * 0.5, CELL * 0.5)
+				var at = Vector3((cell.x + 0.25 + sx * 0.5) * CELL, 0.02, (cell.y + 0.25 + sz * 0.5) * CELL)
+				chunk.tiles.append(_mesh(tile, at, "floor", "floor_alt"))
 	var rng = RandomNumberGenerator.new()
-	rng.seed = hash(cell)
+	rng.seed = hash(cell) ^ world_seed
 	for i in rng.randi_range(0, 2):
 		var at = Vector3((cell.x + rng.randf()) * CELL, 0, (cell.y + rng.randf()) * CELL)
 		if at.length() < CLEAR_RADIUS:
@@ -98,18 +112,20 @@ func _make_chunk(cell: Vector2i) -> void:
 		var shape = "cylinder" if rng.randf() < 0.4 else "box"
 		var extent: Vector3
 		if wall:
-			extent = Vector3(rng.randf_range(2, 5), rng.randf_range(1.6, 2.6), rng.randf_range(2, 5) if shape == "box" else rng.randf_range(2, 5))
+			extent = Vector3(rng.randf_range(2, 5), rng.randf_range(1.6, 2.6), rng.randf_range(2, 5))
 		else:
 			extent = Vector3(rng.randf_range(1.2, 2.2), rng.randf_range(1.0, 1.6), rng.randf_range(1.2, 2.2))
 		if shape == "cylinder":
 			extent.z = extent.x
-		chunks[cell].append(_block(at, extent, "wall" if wall else "prop", "wall" if wall else "prop", shape, true))
+		chunk.props.append(_block(at, extent, "wall" if wall else "prop", "wall" if wall else "prop", shape, true))
 
 func _drop_chunk(cell: Vector2i) -> void:
-	for prop in chunks[cell]:
+	for prop in chunks[cell].props:
 		blocks.erase(prop.entry)
 		prop.holder.queue_free()
 		prop.body.queue_free()
+	for tile in chunks[cell].tiles:
+		tile.queue_free()
 	chunks.erase(cell)
 
 ## A spawn point on a ring around the player, for endless waves. When the
