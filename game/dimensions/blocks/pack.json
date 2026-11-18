@@ -1,0 +1,31 @@
+{
+	"id": "blocks", "name": "Plastic Blocks", "family": "Plastic", "order": 4,
+	"tagline": "Snap-together toy-brick worlds",
+	"palette": {
+		"bg": "#16202c", "floor": "#aeb9c4", "floor_alt": "#93a4b2", "wall": "#d8343a", "prop": "#f6c700",
+		"player": "#2b7fff", "player_accent": "#ffd23f", "grunt": "#e4572e", "runner": "#3fc257",
+		"tank": "#7a52c6", "boss": "#12161c", "bot": "#ff8a3d", "weapon": "#39434f", "ink": "#141b24",
+		"bullet_player": "#37e1ff", "bullet_enemy": "#ff3f6e", "pickup_health": "#2ecf63", "pickup_ammo": "#ffc21a",
+		"flash": "#ffffff", "ui_bg": "#16202c", "ui_fg": "#ffffff", "ui_accent": "#ffd23f", "ui_danger": "#ff4f5e"
+	},
+	"environment": {"ambient": "#dfe8f2", "ambient_energy": 0.48, "light": "#fff6e6", "light_energy": 0.98, "light_pitch": -56, "light_yaw": -34, "shadows": true},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {"wrap": 0.12, "gloss": 0.9, "shininess": 46.0, "sheen": 0.16, "rim": 0.28, "speckle": 0.0, "seam": 0.0},
+	"roles": {
+		"floor": {"shader": "floor.gdshader", "params": {"pitch": 1.0, "stud": 0.34, "relief": 1.0, "gap_shade": 0.2, "top_lift": 0.06, "gloss": 0.16, "shininess": 48.0}},
+		"wall": {"params": {"gloss": 0.8, "rim": 0.22, "seam": 0.6}},
+		"prop": {"params": {"gloss": 0.85, "rim": 0.24}},
+		"character": {"params": {"gloss": 0.95, "shininess": 54.0, "rim": 0.32}},
+		"weapon": {"params": {"gloss": 1.0, "shininess": 60.0, "rim": 0.3}},
+		"bullet": {"params": {"glow": 0.8, "gloss": 1.0, "shininess": 64.0, "rim": 0.4}},
+		"pickup": {"params": {"glow": 0.32, "gloss": 1.0, "shininess": 58.0, "rim": 0.36}}
+	},
+	"outline": {"width": 0.0},
+	"overlay": {"shader": "overlay.gdshader", "params": {"vignette": 0.42, "gloss": 0.06, "edge_tint": "#0c141d", "snap_tint": "#eaf4ff", "pulse_tint": "#ffd23f"}},
+	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {"blaster": "Brick Blaster", "scatter": "Scatter Studs", "rapid": "Rapid Ratchet", "launcher": "Boom Brick"},
+	"hud": {"radius": 4, "border": 4, "shadow": 5, "tilt": 0.0, "uppercase": true, "font_scale": 1.0},
+	"feel": {"hitstop": 0.03, "shake": 1.1},
+	"desk": {"object": "blocks", "cover": "@wall", "art": "@player", "accent": "@player_accent"}
+}
