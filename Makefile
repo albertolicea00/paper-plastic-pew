@@ -11,6 +11,7 @@ IOS_ZIP := builds/ios/paper-plastic-pew.zip
 MACOS_ZIP := builds/macos/paper-plastic-pew.zip
 DIMENSION ?= anime
 MODE ?= survival
+VIEW ?= top
 
 .PHONY: help import run touch shift check capture captures android android-release \
 	install-android ios macos windows linux clean
@@ -49,7 +50,7 @@ check:
 capture:
 	mkdir -p builds/captures
 	"$(GODOT_BIN)" --path "$(PROJECT)" --resolution 1280x720 -- --capture="$(CURDIR)/builds/captures/$(DIMENSION).png" \
-	  --dimension=$(DIMENSION) --mode=$(MODE) --arena=crossroads --capture-after=7
+	  --dimension=$(DIMENSION) --mode=$(MODE) --arena=crossroads --view=$(VIEW) --mute --capture-after=7
 
 captures:
 	for folder in $(PROJECT)/dimensions/*/; do $(MAKE) capture DIMENSION=$$(basename $$folder); done

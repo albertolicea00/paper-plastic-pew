@@ -5,6 +5,7 @@ extends Node
 ##   --smoke                      headless gameplay check, see core/smoke.gd
 ##   --mode=<mode> --dimension=<id> --arena=<id> --bots=<n>   start a match directly
 ##   --touch                      show touch controls on desktop
+##   --mute                       silence music and effects (for test captures)
 ##   --view=top|shoulder|weapon   camera view for this run
 ##   --autopilot                  let the test pilot play
 ##   --capture=<file.png>         save a frame after --capture-after seconds (default 4) and quit;
@@ -29,6 +30,9 @@ func _ready() -> void:
 	dimensions = Dimensions.new()
 	add_child(dimensions)
 	sfx = Sfx.new()
+	if options.has("mute"):
+		sfx.effects_volume = 0.0
+		sfx.music_volume = 0.0
 	add_child(sfx)
 	var save = ConfigFile.new()
 	if save.load(SAVE) == OK:
