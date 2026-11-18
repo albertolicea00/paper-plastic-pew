@@ -89,7 +89,10 @@ func fire() -> bool:
 	if left > 0:
 		ammo[weapon_id] = left - 1
 	cooldown = 1.0 / float(weapon.rate)
-	var origin = global_position + Vector3(0, MUZZLE_HEIGHT, 0)
+	# Bullets leave the weapon muzzle, not the chest; keep them on the aim plane
+	# so travel stays flat and matches the crosshair.
+	var muzzle = rig.muzzle_point()
+	var origin = Vector3(muzzle.x, MUZZLE_HEIGHT, muzzle.z)
 	for i in int(weapon.pellets):
 		var angle = deg_to_rad(randf_range(-1.0, 1.0) * (float(weapon.spread) + aim_error))
 		game.projectiles.spawn(origin, aim.rotated(Vector3.UP, angle), weapon, self)

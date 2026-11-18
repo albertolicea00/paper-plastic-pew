@@ -61,6 +61,17 @@ func add_part(part: String, mesh: Mesh, at: Vector3, color_key: String, role: St
 	Dimensions.hub.style(node, role, color_key)
 	return node
 
+# World point at the tip of the weapon's muzzle, for spawning bullets. Falls
+# back to the body centre when a character carries no weapon part.
+func muzzle_point() -> Vector3:
+	if parts.has("weapon"):
+		var gun: MeshInstance3D = parts["weapon"]
+		if gun.mesh != null:
+			var front = gun.mesh.get_aabb().position.z
+			return gun.global_transform * Vector3(0, 0, front)
+		return gun.global_position
+	return global_position
+
 func set_first_person(value: bool) -> void:
 	first_person = value
 	for part in parts:
