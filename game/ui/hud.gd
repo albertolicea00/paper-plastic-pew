@@ -9,6 +9,9 @@ var banner = ""
 var banner_sub = ""
 var banner_left = 0.0
 var banner_span = 1.0
+# Where the last damage came from (horizontal world direction) and how long to show it.
+var hurt_from = Vector3.ZERO
+var hurt_left = 0.0
 var sheet: VBoxContainer
 var sheet_title: Label
 var sheet_body: Label
@@ -109,8 +112,28 @@ func _box(pack: DimensionPack, fill: Color) -> StyleBoxFlat:
 	box.anti_aliasing = true
 	return box
 
+## Flag the direction damage came from, for the hurt arrow.
+func hit_from(world_pos: Vector3) -> void:
+	var to = world_pos - game.player.global_position
+	to.y = 0.0
+	if to.length_squared() > 0.001:
+		hurt_from = to.normalized()
+		hurt_left = 1.1
+
+# Screen bearing of a horizontal world direction, 0 = toward the top of the
+# screen (where the camera looks), growing clockwise. Works in every view.
+func _bearing(dir: Vector3) -> float:
+	var basis = game.camera.global_transform.basis
+	var right = Vector2(basis.x.x, basis.x.z)
+	var ahead = Vector2(-basis.z.x, -basis.z.z)
+	if ahead.length_squared() < 0.0001:
+		ahead = Vector2(basis.y.x, basis.y.z)
+	var flat = Vector2(dir.x, dir.z)
+	return atan2(flat.dot(right.normalized()), flat.dot(ahead.normalized()))
+
 func _process(delta: float) -> void:
 	banner_left = maxf(0.0, banner_left - delta / maxf(Engine.time_scale, 0.01))
+	hurt_left = maxf(0.0, hurt_left - delta)
 	queue_redraw()
 
 func _panel(rect: Rect2, fill: Color, tilt: float) -> void:
@@ -140,6 +163,23 @@ func _bar(rect: Rect2, ratio: float, tone: Color) -> void:
 		fill.bg_color = tone
 		fill.set_corner_radius_all(int(maxf(0.0, float(pack.hud.radius) - float(pack.hud.border) - 2.0)))
 		draw_style_box(fill, inner)
+
+# A chevron at the screen edge pointing outward along `bearing` (0 = up).
+func _edge_marker(bearing: float, tone: Color, strength: float, big: bool = false) -> void:
+	var inset = TouchSticks.safe_insets(self)
+	var centre = Vector2((inset[0] + size.x - inset[2]) * 0.5, (inset[1] + size.y - inset[3]) * 0.5)
+	var radius = Vector2(size.x * 0.5 - inset[0] - 70.0, size.y * 0.5 - inset[1] - 70.0)
+	var dir = Vector2(sin(bearing), -cos(bearing))
+	var at = centre + dir * radius
+	var out = dir
+	var side = Vector2(-dir.y, dir.x)
+	var span = (18.0 if big else 12.0) * clampf(strength, 0.3, 1.0)
+	var alpha = Color(tone, clampf(strength, 0.0, 1.0))
+	var ink = Color(game.dimensions.active.color("ink"), alpha.a)
+	for scale in ([4.0, 2.0] if big else [3.0, 1.5]):
+		var colour = ink if scale > 2.5 else alpha
+		draw_line(at - side * span - out * span * 0.3, at + out * span, colour, scale, true)
+		draw_line(at + side * span - out * span * 0.3, at + out * span, colour, scale, true)
 
 func _draw() -> void:
 	if game == null or game.player == null:
@@ -188,6 +228,18 @@ func _draw() -> void:
 		for arm in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
 			draw_line(centre + arm * 7.0, centre + arm * 19.0, pack.color("ink"), 6.0, true)
 			draw_line(centre + arm * 8.0, centre + arm * 18.0, accent, 3.0, true)
+	# Edge chevrons for nearby threats you cannot see, in the body-locked views.
+	if game.view != "top" and player.alive and not sheet.visible:
+		var near = game.actors.filter(func(a): return a.alive and a.team != player.team)
+		near.sort_custom(func(a, b): return a.global_position.distance_squared_to(player.global_position) < b.global_position.distance_squared_to(player.global_position))
+		for enemy in near.slice(0, 5):
+			var dir = enemy.global_position - player.global_position
+			# Only flag what is off to the side or behind, not what is dead ahead.
+			if absf(_bearing(dir)) > 0.5:
+				_edge_marker(_bearing(dir), pack.color("ui_danger"), 0.55)
+	# Hurt arrow: where the last hit came from, in every view.
+	if hurt_left > 0.0 and player.alive and not sheet.visible:
+		_edge_marker(_bearing(hurt_from), pack.color("ui_danger"), hurt_left / 1.1, true)
 	# Announcement banner.
 	if banner_left > 0.0 and not sheet.visible:
 		var age = banner_span - banner_left

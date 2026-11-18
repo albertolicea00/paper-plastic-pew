@@ -137,11 +137,13 @@ func clear_line(from: Vector3, to: Vector3) -> bool:
 	var lift = Vector3(0, Actor.MUZZLE_HEIGHT, 0)
 	return get_world_3d().direct_space_state.intersect_ray(PhysicsRayQueryParameters3D.create(from + lift, to + lift, 1)).is_empty()
 
-func on_hit(actor: Actor, _amount: float, _from: Actor) -> void:
+func on_hit(actor: Actor, _amount: float, from: Actor) -> void:
 	if actor == player:
 		vfx.shake(0.35)
 		vfx.impact(0.6)
 		sfx.play("hurt")
+		if is_instance_valid(from):
+			hud.hit_from(from.global_position)
 	else:
 		sfx.play("hit", actor.global_position)
 
