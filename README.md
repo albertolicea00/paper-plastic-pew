@@ -2,7 +2,7 @@
 
 A multiverse top-down twin-stick shooter where arenas, art direction, and character animation shift across a growing roster of **Paper** and **Plastic** visual dimensions.
 
-> **Status:** Playable vertical slice on desktop. Five dimensions (Anime / Manga, Cartoon / Comic, Clay / Plasticine, Plastic Blocks, Pixel Art) — each with its own shapes, shaders, animation, arenas, music and HUD theme — plus four modes, three camera views and real-time dimension shifts. Not yet played on a phone; Android and iOS exports are configured but unbuilt.
+> **Status:** Playable vertical slice on desktop. Six dimensions (Anime / Manga, Cartoon / Comic, Clay / Plasticine, Plastic Blocks, Pixel Art, Stickman) — each with its own shapes, shaders, animation, arenas, music and HUD theme — plus four modes, three camera views and real-time dimension shifts. Not yet played on a phone; Android and iOS exports are configured but unbuilt.
 
 ## Run
 
