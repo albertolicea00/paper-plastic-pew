@@ -80,7 +80,11 @@ func _ready() -> void:
 	if options.has("menu-start"):
 		get_tree().create_timer(0.6).timeout.connect(_start)
 	if options.has("menu-info"):
-		_info(options.get("menu-info", "controls"))
+		var screen = InfoScreen.new()
+		add_child(screen)
+		screen.open(_pack(), options.get("menu-info", "controls"), func(): go.grab_focus())
+		if options.has("menu-device"):
+			screen.call_deferred("_switch", options.get("menu-device", "keyboard"))
 
 func _build_card() -> void:
 	prev = _button("<", func(): _step(-1))
