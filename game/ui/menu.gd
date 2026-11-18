@@ -107,12 +107,18 @@ func _build_card() -> void:
 func _build_side() -> void:
 	side = PanelContainer.new()
 	add_child(side)
+	# A scroll wrapper so the lower buttons (Credits, Quit) are never clipped
+	# when the panel is short or the fonts are tall.
+	var scroll = ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	side.add_child(scroll)
 	var column = VBoxContainer.new()
-	column.add_theme_constant_override("separation", 8)
-	side.add_child(column)
+	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override("separation", 6)
+	scroll.add_child(column)
 	for i in MODES.size():
 		var button = _button("", func(): _set_mode(i, true))
-		button.custom_minimum_size = Vector2(0, 62)
+		button.custom_minimum_size = Vector2(0, 58)
 		button.focus_entered.connect(func(): _set_mode(i, false))
 		var pad = MarginContainer.new()
 		pad.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -127,7 +133,7 @@ func _build_side() -> void:
 		words.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		words.alignment = BoxContainer.ALIGNMENT_CENTER
-		words.add_theme_constant_override("separation", -2)
+		words.add_theme_constant_override("separation", 2)
 		row.add_child(words)
 		_label(words, HORIZONTAL_ALIGNMENT_LEFT)
 		_label(words, HORIZONTAL_ALIGNMENT_LEFT)
@@ -164,7 +170,7 @@ func _build_side() -> void:
 	var more = _button("+", func(): bots = mini(8, bots + 1))
 	bots_buttons = [fewer, more]
 	for button in bots_buttons:
-		button.custom_minimum_size = Vector2(72, 56)
+		button.custom_minimum_size = Vector2(72, 48)
 		button.set_meta("row", true)
 	bots_row.add_child(fewer)
 	bots_value = _label(bots_row)
@@ -175,10 +181,10 @@ func _build_side() -> void:
 	gap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(gap)
 	go = _button("", _start)
-	go.custom_minimum_size = Vector2(0, 76)
+	go.custom_minimum_size = Vector2(0, 64)
 	column.add_child(go)
 	var settings = _button("Settings", _open_settings)
-	settings.custom_minimum_size = Vector2(0, 56)
+	settings.custom_minimum_size = Vector2(0, 50)
 	column.add_child(settings)
 	var info = _row(column)
 	var controls = _button("Controls", func(): _info("controls"))
@@ -221,7 +227,7 @@ func _label(parent: Control, align: int = HORIZONTAL_ALIGNMENT_CENTER) -> Label:
 func _button(text: String, action: Callable) -> Button:
 	var button = Button.new()
 	button.text = text
-	button.custom_minimum_size = Vector2(64, 56)
+	button.custom_minimum_size = Vector2(56, 48)
 	button.pressed.connect(action)
 	button.pressed.connect(_refresh)
 	return button
