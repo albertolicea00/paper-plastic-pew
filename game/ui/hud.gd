@@ -36,8 +36,15 @@ func _ready() -> void:
 	sheet.add_child(sheet_body)
 	resume = _button("Resume", func(): game.set_paused(false))
 	view_button = _button("", _cycle_view)
+	_button("Controls", func(): _info("controls"))
+	_button("Credits", func(): _info("credits"))
 	_button("Restart", func(): game.main.start(game.config))
 	_button("Main menu", func(): game.main.show_menu())
+
+func _info(which: String) -> void:
+	var screen = InfoScreen.new()
+	add_child(screen)
+	screen.open(game.dimensions.active, which, Callable())
 
 func _button(text: String, action: Callable) -> Button:
 	var button = Button.new()

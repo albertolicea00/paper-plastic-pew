@@ -43,6 +43,7 @@ var level_buttons: Array[Button] = []
 var level_label: Label
 var view_buttons: Array[Button] = []
 var view_label: Label
+var info_buttons: Array[Button] = []
 var bots_row: HBoxContainer
 var bots_label: Label
 var bots_value: Label
@@ -78,6 +79,8 @@ func _ready() -> void:
 	go.grab_focus.call_deferred()
 	if options.has("menu-start"):
 		get_tree().create_timer(0.6).timeout.connect(_start)
+	if options.has("menu-info"):
+		_info(options.get("menu-info", "controls"))
 
 func _build_card() -> void:
 	prev = _button("<", func(): _step(-1))
@@ -169,9 +172,22 @@ func _build_side() -> void:
 	go = _button("", _start)
 	go.custom_minimum_size = Vector2(0, 76)
 	column.add_child(go)
+	var info = _row(column)
+	var controls = _button("Controls", func(): _info("controls"))
+	var credits = _button("Credits", func(): _info("credits"))
+	for button in [controls, credits]:
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		info.add_child(button)
+	info_buttons = [controls, credits]
 	quit = _button("Quit", func(): get_tree().quit())
 	quit.visible = not (OS.has_feature("mobile") or OS.has_feature("web"))
 	column.add_child(quit)
+
+# Credits / Controls overlay, themed by the picked dimension.
+func _info(which: String) -> void:
+	var screen = InfoScreen.new()
+	add_child(screen)
+	screen.open(_pack(), which, func(): go.grab_focus())
 
 func _row(parent: Control) -> HBoxContainer:
 	var row = HBoxContainer.new()
@@ -348,6 +364,9 @@ func _refresh() -> void:
 	_write(bots_value, str(bots), 26, accent)
 	for button in bots_buttons:
 		_skin(button, false, 28)
+	for button in info_buttons:
+		_skin(button, false, 20)
+		button.text = _case(button.text)
 	_skin(go, true, 30)
 	go.text = _case("Start")
 	_skin(quit, false, 18)
