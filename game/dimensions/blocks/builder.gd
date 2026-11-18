@@ -150,17 +150,18 @@ func _head(rig: CharacterRig, at: Vector3, radius: float, height: float, tone: S
 # The brick blaster: a stud-barrel pointing -Z with a boxy receiver and grip.
 # The right hand holds it, so the weapon view shows barrel + claw bottom-right.
 func _blaster(rig: CharacterRig, at: Vector3, size: float, trim: String, ammo: String) -> void:
-	var gun = rig.add_part("weapon", fuse("blaster%f" % size, func(): return [
-		slab(Vector3(0, 0, -0.1 * size), Vector3(0.22, 0.2, 0.5) * size),       # receiver
-		slab(Vector3(0, -0.22 * size, 0.08 * size), Vector3(0.16, 0.26, 0.18) * size, Vector3(0.25, 0, 0)),  # grip
-		tube(Vector3(0, 0.02 * size, -0.45 * size), 0.07 * size, 0.42 * size, X90)]), at, "weapon", "weapon")
+	# Unit mesh; the node carries the per-kind size so a boss cannon reads big.
+	var gun = rig.add_part("weapon", fuse("blaster", func(): return [
+		slab(Vector3(0, 0, -0.1), Vector3(0.22, 0.2, 0.5)),                          # receiver
+		slab(Vector3(0, -0.22, 0.08), Vector3(0.16, 0.26, 0.18), Vector3(0.25, 0, 0)),  # grip
+		tube(Vector3(0, 0.02, -0.45), 0.07, 0.42, X90)]), at, "weapon", "weapon")
 	gun.scale = Vector3.ONE * size
 	# Barrel muzzle stud, a sight stud on top and a loaded pellet.
-	_detail(gun, "blaster_trim%f" % size, func(): return [
+	_detail(gun, "blaster_trim", func(): return [
 		tube(Vector3(0, 0.02, -0.68), 0.1, 0.1, X90),
 		stud(Vector3(0, 0.12, -0.05)),
 		slab(Vector3(0, 0.12, 0.18), Vector3(0.1, 0.1, 0.14))], trim, "weapon")
-	_detail(gun, "blaster_bolt%f" % size, func(): return [
+	_detail(gun, "blaster_bolt", func(): return [
 		tube(Vector3(0, 0.02, -0.72), 0.055, 0.12, X90)], ammo, "weapon")
 
 # Classic minifig hero: blue brick body, yellow chest plate, visor face.
@@ -416,15 +417,13 @@ func border(holder: Node3D, extent: Vector3) -> void:
 				var offset = clampf(-length * 0.5 + wide * (i + 0.5) - shift, -length * 0.5 + wide * 0.25, length * 0.5 - wide * 0.25)
 				p.append(slab(Vector3(offset, tall * (row + 0.5), 0), Vector3(wide - 0.03, tall - 0.02, minf(extent.z, extent.x) - 0.03 if along_x else extent.x - 0.03)))
 		return p), Vector3.ZERO, "wall", "wall", euler)
-	# One row of studs along the top of the kerb.
+	# A single centred row of studs along the top of the kerb; cheap on purpose,
+	# the perimeter is long.
 	add(holder, fuse("border_studs%f/%f" % [length, extent.y], func():
 		var p: Array = []
-		var n = maxi(1, roundi(length / 0.34))
-		var band = (minf(extent.z, extent.x) if along_x else extent.x) - 0.12
-		var rows = maxi(1, roundi(band / 0.34))
+		var n = maxi(1, roundi(length / 0.5))
 		for i in n:
-			for j in rows:
-				p.append(stud(Vector3(-length * 0.5 + (i + 0.5) * length / n, extent.y, (j - (rows - 1) * 0.5) * 0.3), 0.12))
+			p.append(stud(Vector3(-length * 0.5 + (i + 0.5) * length / n, extent.y, 0), 0.12))
 		return p), Vector3.ZERO, "wall", "prop", euler)
 
 # ------------------------------------------------------------------ pickup ---
