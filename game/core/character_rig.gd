@@ -90,11 +90,19 @@ func stretch(part: String, factor: Vector3) -> void:
 func squash(factor: Vector3) -> void:
 	scale = factor * base_scale
 
+# Every styled mesh in the rig, including glued details under a part.
+func _meshes(node: Node = self, into: Array = []) -> Array:
+	for child in node.get_children():
+		if child is MeshInstance3D:
+			into.append(child)
+		_meshes(child, into)
+	return into
+
 func flash(seconds: float = 0.07) -> void:
 	if _flash <= 0.0:
 		var white = Dimensions.hub.active.material("flash", "flash")
-		for part in parts:
-			parts[part].material_override = white
+		for mesh in _meshes():
+			mesh.material_override = white
 	_flash = seconds
 
 func tick(delta: float) -> void:
@@ -109,6 +117,7 @@ func tick(delta: float) -> void:
 	if _flash > 0.0:
 		_flash -= delta
 		if _flash <= 0.0:
-			for part in parts:
-				Dimensions.hub.apply(parts[part])
+			for mesh in _meshes():
+				if mesh.is_in_group(Dimensions.GROUP):
+					Dimensions.hub.apply(mesh)
 	Dimensions.hub.active.animator.animate(self, delta)
