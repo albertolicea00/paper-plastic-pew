@@ -182,35 +182,63 @@ func _draw_mouse(c: Control, at: Vector2, side: Vector2) -> void:
 	c.draw_line(at + Vector2(side.x * 0.5, 2), at + Vector2(side.x * 0.5, side.y * 0.42), ink, 3.0)
 	_center(c, "FIRE", at + Vector2(side.x * 0.5, side.y + 16), 14, pack.color("ui_fg"))
 
+# Two controllers side by side: Xbox (lettered buttons) and PlayStation (shapes).
 func _draw_gamepad(c: Control, r: Rect2) -> void:
-	var mid = r.position + Vector2(r.size.x * 0.5, r.size.y * 0.52)
+	var w = minf(r.size.x * 0.44, 440.0)
+	var y = r.position.y + r.size.y * 0.40
+	_controller(c, Vector2(r.position.x + r.size.x * 0.27, y), w, "xbox")
+	_controller(c, Vector2(r.position.x + r.size.x * 0.73, y), w, "play")
+	# Shared legend under both.
+	var legend = r.position + Vector2(r.size.x * 0.5, r.size.y * 0.90)
+	_caption(c, legend + Vector2(0, -16), "LEFT STICK MOVE   ·   RIGHT STICK AIM & FIRE", pack.color("ui_accent"))
+	_caption(c, legend + Vector2(0, 8), "TOP BUTTON SWAP   ·   BOTTOM BUTTON DASH   ·   START PAUSE   ·   BACK VIEW", Color(pack.color("ui_fg"), 0.85))
+
+func _controller(c: Control, mid: Vector2, w: float, platform: String) -> void:
 	var ink = pack.color("ink")
+	_caption(c, mid + Vector2(0, -116), "XBOX" if platform == "xbox" else "PLAYSTATION", pack.color("ui_fg"))
 	var body = StyleBoxFlat.new()
 	body.bg_color = pack.color("ui_bg").lightened(0.12)
 	body.border_color = ink
 	body.set_border_width_all(4)
-	body.set_corner_radius_all(70)
-	var w = minf(r.size.x * 0.62, 460.0)
-	body.draw(c.get_canvas_item(), Rect2(mid - Vector2(w * 0.5, 80), Vector2(w, 170)))
-	# Shoulders.
+	body.set_corner_radius_all(64)
+	body.draw(c.get_canvas_item(), Rect2(mid - Vector2(w * 0.5, 62), Vector2(w, 150)))
+	# Shoulders, labelled per platform.
 	for s in [-1, 1]:
-		_cap(c, mid + Vector2(s * w * 0.42 - 34, -118), Vector2(68, 30), "LB" if s < 0 else "RB")
-	_caption(c, mid + Vector2(-w * 0.42, -150), "MOVE", pack.color("ui_accent"))
-	_caption(c, mid + Vector2(w * 0.42, -150), "AIM / FIRE", pack.color("ui_accent"))
-	# Left stick (move) and right stick (aim/fire).
-	_stick(c, mid + Vector2(-w * 0.3, -10), 34, "MOVE")
-	_stick(c, mid + Vector2(w * 0.12, 40), 30, "AIM")
-	# D-pad.
-	_dpad(c, mid + Vector2(-w * 0.07, 40), 16)
-	# Face buttons A/B/X/Y, spread into a diamond with actions outside it.
-	var face = mid + Vector2(w * 0.33, 4)
-	_face(c, face + Vector2(0, 34), "A", pack.color("runner"))
-	_face(c, face + Vector2(34, 0), "B", pack.color("boss"))
-	_face(c, face + Vector2(-34, 0), "X", pack.color("player"))
-	_face(c, face + Vector2(0, -34), "Y", pack.color("prop"))
-	_center(c, "SWAP", face + Vector2(0, -60), 13, pack.color("ui_fg"))
-	_center(c, "DASH", face + Vector2(0, 60), 13, pack.color("ui_fg"))
-	_caption(c, mid + Vector2(0, 112), "START = PAUSE   ·   BACK = CHANGE VIEW", Color(pack.color("ui_fg"), 0.85))
+		var tag = ("LB" if s < 0 else "RB") if platform == "xbox" else ("L1" if s < 0 else "R1")
+		_cap(c, mid + Vector2(s * w * 0.42 - 28, -96), Vector2(56, 26), tag)
+	_stick(c, mid + Vector2(-w * 0.3, -6), 30, "")
+	_stick(c, mid + Vector2(w * 0.1, 44), 26, "")
+	_dpad(c, mid + Vector2(-w * 0.06, 44), 14)
+	# Face buttons: Xbox letters, PlayStation shapes. Top=swap, bottom=dash.
+	var face = mid + Vector2(w * 0.32, 6)
+	if platform == "xbox":
+		_face(c, face + Vector2(0, 30), "A", pack.color("runner"))
+		_face(c, face + Vector2(30, 0), "B", pack.color("boss"))
+		_face(c, face + Vector2(-30, 0), "X", pack.color("player"))
+		_face(c, face + Vector2(0, -30), "Y", pack.color("prop"))
+	else:
+		_ps_button(c, face + Vector2(0, 30), "cross", Color("#4a7fd0"))
+		_ps_button(c, face + Vector2(30, 0), "circle", Color("#d84a52"))
+		_ps_button(c, face + Vector2(-30, 0), "square", Color("#d858a8"))
+		_ps_button(c, face + Vector2(0, -30), "triangle", Color("#3fb58a"))
+
+func _ps_button(c: Control, at: Vector2, glyph: String, tone: Color) -> void:
+	var ink = pack.color("ink")
+	c.draw_circle(at, 15, pack.color("ui_bg").darkened(0.15))
+	c.draw_arc(at, 15, 0, TAU, 22, ink, 2.5, true)
+	var k = 6.0
+	match glyph:
+		"cross":
+			c.draw_line(at + Vector2(-k, -k), at + Vector2(k, k), tone, 3.0, true)
+			c.draw_line(at + Vector2(k, -k), at + Vector2(-k, k), tone, 3.0, true)
+		"circle":
+			c.draw_arc(at, k + 1, 0, TAU, 20, tone, 3.0, true)
+		"square":
+			c.draw_rect(Rect2(at - Vector2(k, k), Vector2(k, k) * 2), tone, false, 3.0)
+		"triangle":
+			var pts = PackedVector2Array([at + Vector2(0, -k - 1), at + Vector2(k + 1, k), at + Vector2(-k - 1, k)])
+			for i in 3:
+				c.draw_line(pts[i], pts[(i + 1) % 3], tone, 3.0, true)
 
 func _stick(c: Control, at: Vector2, radius: float, label: String) -> void:
 	var ink = pack.color("ink")
