@@ -4,6 +4,10 @@ extends Node3D
 ## by every dimension; only the styled materials change on a shift.
 
 const WALL_HEIGHT = 2.6
+# Endless map: props are streamed in cells around the player, no boundary walls.
+const CELL = 14.0
+const CELL_RADIUS = 3
+const CLEAR_RADIUS = 11.0
 var size = Vector2(40, 28)
 var spawns: Array[Vector3] = []
 var player_start = Vector3.ZERO
@@ -11,11 +15,17 @@ var title = ""
 var blocks: Array[Dictionary] = []
 var borders: Array[Dictionary] = []
 var scenery: Node3D
+var endless = false
+var ground: Node3D
+var chunks: Dictionary = {}
 
 func build(spec: Dictionary) -> void:
 	title = spec.get("name", "Arena")
 	size = Vector2(spec.size[0], spec.size[1])
 	player_start = Vector3(spec.player[0], 0, spec.player[1])
+	if spec.get("endless", false):
+		_build_endless()
+		return
 	for point in spec.spawns:
 		spawns.append(Vector3(point[0], 0, point[1]))
 	var ground = PlaneMesh.new()
@@ -39,6 +49,79 @@ func build(spec: Dictionary) -> void:
 	add_child(scenery)
 	add_to_group(Dimensions.REBUILT)
 	rebuild()
+
+# An endless page: a floor plane that follows the player, props streamed in
+# cells, no boundary. The dimension's own floor/props/scenery still apply.
+func _build_endless() -> void:
+	endless = true
+	title = "Endless " + Dimensions.hub.active.family
+	player_start = Vector3.ZERO
+	ground = Node3D.new()
+	add_child(ground)
+	var span = CELL * (CELL_RADIUS * 2 + 3)
+	var plane = PlaneMesh.new()
+	plane.size = Vector2(span, span)
+	var floor_node = MeshInstance3D.new()
+	floor_node.mesh = plane
+	ground.add_child(floor_node)
+	Dimensions.hub.style(floor_node, "floor", "floor")
+	scenery = Node3D.new()
+	add_child(scenery)
+	add_to_group(Dimensions.REBUILT)
+	stream(Vector3.ZERO)
+
+# Keep a ring of prop cells around `center` (the player), dropping far ones.
+func stream(center: Vector3) -> void:
+	if not endless:
+		return
+	ground.position = Vector3(snappedf(center.x, CELL), 0, snappedf(center.z, CELL))
+	var here = Vector2i(floori(center.x / CELL), floori(center.z / CELL))
+	for dx in range(-CELL_RADIUS, CELL_RADIUS + 1):
+		for dz in range(-CELL_RADIUS, CELL_RADIUS + 1):
+			var cell = here + Vector2i(dx, dz)
+			if not chunks.has(cell):
+				_make_chunk(cell)
+	for cell in chunks.keys():
+		if absi(cell.x - here.x) > CELL_RADIUS + 1 or absi(cell.y - here.y) > CELL_RADIUS + 1:
+			_drop_chunk(cell)
+
+# Deterministic props for one cell: a couple of blocks, origin kept clear.
+func _make_chunk(cell: Vector2i) -> void:
+	chunks[cell] = []
+	var rng = RandomNumberGenerator.new()
+	rng.seed = hash(cell)
+	for i in rng.randi_range(0, 2):
+		var at = Vector3((cell.x + rng.randf()) * CELL, 0, (cell.y + rng.randf()) * CELL)
+		if at.length() < CLEAR_RADIUS:
+			continue
+		var wall = rng.randf() < 0.4
+		var shape = "cylinder" if rng.randf() < 0.4 else "box"
+		var extent: Vector3
+		if wall:
+			extent = Vector3(rng.randf_range(2, 5), rng.randf_range(1.6, 2.6), rng.randf_range(2, 5) if shape == "box" else rng.randf_range(2, 5))
+		else:
+			extent = Vector3(rng.randf_range(1.2, 2.2), rng.randf_range(1.0, 1.6), rng.randf_range(1.2, 2.2))
+		if shape == "cylinder":
+			extent.z = extent.x
+		chunks[cell].append(_block(at, extent, "wall" if wall else "prop", "wall" if wall else "prop", shape, true))
+
+func _drop_chunk(cell: Vector2i) -> void:
+	for prop in chunks[cell]:
+		blocks.erase(prop.entry)
+		prop.holder.queue_free()
+		prop.body.queue_free()
+	chunks.erase(cell)
+
+## A spawn point on a ring around the player, for endless waves. When the
+## player is fleeing (`heading` set), most spawns land ahead of them and a bit
+## closer, so running away just runs you into more enemies instead of escaping.
+func ring_spawn(from: Vector3, heading: Vector3 = Vector3.ZERO) -> Vector3:
+	var angle = randf() * TAU
+	var dist = randf_range(17.0, 24.0)
+	if heading.length() > 0.5 and randf() < 0.65:
+		angle = atan2(heading.x, heading.z) + randf_range(-1.1, 1.1)
+		dist = randf_range(14.0, 20.0)
+	return from + Vector3(sin(angle), 0, cos(angle)) * dist
 
 ## Dress the shared layout in the active dimension's shapes.
 func rebuild() -> void:
@@ -80,7 +163,7 @@ func _mesh(mesh: Mesh, at: Vector3, role: String, color_key: String) -> MeshInst
 	Dimensions.hub.style(node, role, color_key)
 	return node
 
-func _block(at: Vector3, extent: Vector3, role: String, color_key: String, shape: String, dressed: bool = false) -> void:
+func _block(at: Vector3, extent: Vector3, role: String, color_key: String, shape: String, dressed: bool = false) -> Dictionary:
 	var body = StaticBody3D.new()
 	body.position = at + Vector3(0, extent.y * 0.5, 0)
 	body.collision_layer = 1
@@ -102,11 +185,16 @@ func _block(at: Vector3, extent: Vector3, role: String, color_key: String, shape
 		var holder = Node3D.new()
 		holder.position = at
 		add_child(holder)
-		blocks.append({"holder": holder, "extent": extent, "shape": shape, "role": role, "color": color_key})
-	else:
-		var box_mesh = BoxMesh.new()
-		box_mesh.size = extent
-		_mesh(box_mesh, body.position, role, color_key)
+		var entry = {"holder": holder, "extent": extent, "shape": shape, "role": role, "color": color_key}
+		blocks.append(entry)
+		Dimensions.hub.active.builder.block(holder, extent, shape, role, color_key)
+		return {"body": body, "holder": holder, "entry": entry}
+	var box_mesh = BoxMesh.new()
+	box_mesh.size = extent
+	_mesh(box_mesh, body.position, role, color_key)
+	return {}
 
 func clamp_inside(point: Vector3, margin: float = 1.0) -> Vector3:
+	if endless:
+		return Vector3(point.x, 0, point.z)
 	return Vector3(clampf(point.x, -size.x * 0.5 + margin, size.x * 0.5 - margin), 0, clampf(point.z, -size.y * 0.5 + margin, size.y * 0.5 - margin))

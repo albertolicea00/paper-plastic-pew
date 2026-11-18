@@ -66,11 +66,15 @@ func _ready() -> void:
 	add_child(sun)
 	arena = Arena.new()
 	add_child(arena)
+	# Endless map (not for campaign, which is stage-based); else a fixed arena.
 	# A dimension's own arenas are used when the whole match stays in it.
-	var own: Dictionary = dimensions.active.arenas
-	var pool = own if not own.is_empty() and not shifting and config.get("mode", "") != "campaign" else arenas
-	var wanted: String = config.get("arena", "")
-	arena.build(own.get(wanted, arenas.get(wanted, pool[pool.keys().pick_random()])))
+	if config.get("endless", false) and config.get("mode", "") != "campaign":
+		arena.build({"name": "Endless", "size": [60, 60], "player": [0, 0], "spawns": [], "endless": true})
+	else:
+		var own: Dictionary = dimensions.active.arenas
+		var pool = own if not own.is_empty() and not shifting and config.get("mode", "") != "campaign" else arenas
+		var wanted: String = config.get("arena", "")
+		arena.build(own.get(wanted, arenas.get(wanted, pool[pool.keys().pick_random()])))
 	projectiles = Projectiles.new()
 	vfx = Vfx.new()
 	camera = Camera3D.new()
@@ -212,6 +216,8 @@ func _process(delta: float) -> void:
 	if not playing:
 		return
 	_update_mouse()
+	if arena.endless and player.alive:
+		arena.stream(player.global_position)
 	# Heartbeat rises as the player nears death (below a third of health).
 	var frac = player.health / player.max_health if player.alive else 1.0
 	sfx.danger = clampf((0.33 - frac) / 0.33, 0.0, 1.0)

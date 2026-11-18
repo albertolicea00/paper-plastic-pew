@@ -75,6 +75,12 @@ func run() -> void:
 	game.player.cycle_weapon()
 	check(game.player.weapon_id == "blaster", "weapon cycling failed")
 	var skirmish_kills = game.player.kills + bot_kills
+	# Endless map: no bounds, props stream in around the roaming pilot.
+	game = await play({"mode": "survival", "dimension": dimensions.packs[0].id, "endless": true}, 5.0)
+	check(game.arena.endless, "endless arena did not build")
+	check(game.arena.chunks.size() > 0, "endless arena streamed no prop cells")
+	var far = game.arena.clamp_inside(Vector3(500, 0, 500))
+	check(far.x > 100.0, "endless arena still clamps the player")
 	Engine.time_scale = 1.0
 	main.show_menu()
 	await get_tree().process_frame

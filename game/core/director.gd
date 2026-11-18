@@ -37,7 +37,8 @@ func start() -> void:
 		var points = game.arena.spawns.duplicate()
 		points.shuffle()
 		for i in clampi(int(game.config.get("bots", 4)), 1, BOT_NAMES.size()):
-			var bot = game.spawn("bot", points[i % points.size()], 10 + i)
+			var where = game.arena.ring_spawn(Vector3.ZERO) if game.arena.endless else points[i % points.size()]
+			var bot = game.spawn("bot", where, 10 + i)
 			bot.label = BOT_NAMES[i]
 			bot.persistent = true
 			bot.aim_error = WOBBLE[level] * 1.5
@@ -119,6 +120,11 @@ func reinforce(at: Vector3, count: int) -> void:
 		_spawn_enemy("runner", game.arena.clamp_inside(at + Vector3.FORWARD.rotated(Vector3.UP, randf() * TAU) * 3.0))
 
 func _far_spawn() -> Vector3:
+	if game.arena.endless:
+		# Bias spawns toward where the player is running, so fleeing meets enemies.
+		var heading = game.player.velocity
+		heading.y = 0.0
+		return game.arena.ring_spawn(game.player.global_position, heading)
 	var far = game.arena.spawns.filter(func(point): return point.distance_to(game.player.global_position) > 9.0)
 	return game.arena.spawns.pick_random() if far.is_empty() else far.pick_random()
 
