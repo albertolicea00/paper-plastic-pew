@@ -52,6 +52,13 @@ dimensions/pixel/font.ttf
   Licence: SIL Open Font License 1.1
   Source:  https://github.com/google/fonts/tree/main/ofl/pressstart2p
 
+dimensions/stick/font.ttf
+  Title:   Patrick Hand (PatrickHand-Regular.ttf)
+  Author:  Copyright (c) 2010-2012 Patrick Wagesreiter
+           (mail@patrickwagesreiter.at)
+  Licence: SIL Open Font License 1.1
+  Source:  https://github.com/google/fonts/tree/main/ofl/patrickhand
+
 SOUND EFFECTS
 -------------
 Except for the low-health heartbeat (credited at the end of this section), all
@@ -121,6 +128,12 @@ dimensions/pixel/audio/music.ogg
   Author:  Wolfgang_
   Licence: CC0 1.0
   Source:  https://opengameart.org/content/8-bit-battle-loop
+
+dimensions/stick/audio/music.ogg
+  Title:   Ukulele Forest (Beginning, Loop and End)
+  Author:  StarNinjas
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/ukulele-forest-beginning-loop-and-end
 
 assets/audio/music.ogg (default for packs without their own music)
   Title:   Summer Park - 8bit tune (loop)

@@ -40,5 +40,6 @@ Kenney packs are downloaded from the "Download" button on each pack page; the au
 | `dimensions/clay/audio/music.ogg` | `WereWasI_0.ogg` | Where was I? | yd | CC0 | https://opengameart.org/content/where-was-i | copy |
 | `dimensions/blocks/audio/music.ogg` | `Children's March Theme.ogg` in `childrens_march_theme.zip` | Children's March Theme | Cleyton Kauffman | CC0 | https://opengameart.org/content/childrens-march-theme | copy |
 | `dimensions/pixel/audio/music.ogg` | `8BitBattleLoop.ogg` | 8-Bit Battle Loop | Wolfgang_ | CC0 | https://opengameart.org/content/8-bit-battle-loop | copy |
+| `dimensions/stick/audio/music.ogg` | `forest_loop.ogg` | Ukulele Forest (Beginning, Loop and End) | StarNinjas | CC0 | https://opengameart.org/content/ukulele-forest-beginning-loop-and-end | copy |
 | `assets/audio/music.ogg` | `8bit attempt.ogg` | Summer Park - 8bit tune (loop) | Scribe (Daniel Stephens) | CC0 | https://opengameart.org/content/summer-park-8bit-tune-loop | copy |
 | `assets/audio/menu.ogg` | `Ambient-Loop-isaiah658_0.ogg` | Ambient Relaxing Loop | isaiah658 | CC0 | https://opengameart.org/content/ambient-relaxing-loop | copy |
