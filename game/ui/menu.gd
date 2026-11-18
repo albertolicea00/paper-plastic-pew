@@ -85,6 +85,8 @@ func _ready() -> void:
 		screen.open(_pack(), options.get("menu-info", "controls"), func(): go.grab_focus())
 		if options.has("menu-device"):
 			screen.call_deferred("_switch", options.get("menu-device", "keyboard"))
+	if options.has("menu-settings"):
+		_open_settings()
 
 func _build_card() -> void:
 	prev = _button("<", func(): _step(-1))
@@ -176,13 +178,16 @@ func _build_side() -> void:
 	go = _button("", _start)
 	go.custom_minimum_size = Vector2(0, 76)
 	column.add_child(go)
+	var settings = _button("Settings", _open_settings)
+	settings.custom_minimum_size = Vector2(0, 56)
+	column.add_child(settings)
 	var info = _row(column)
 	var controls = _button("Controls", func(): _info("controls"))
 	var credits = _button("Credits", func(): _info("credits"))
 	for button in [controls, credits]:
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		info.add_child(button)
-	info_buttons = [controls, credits]
+	info_buttons = [controls, credits, settings]
 	quit = _button("Quit", func(): get_tree().quit())
 	quit.visible = not (OS.has_feature("mobile") or OS.has_feature("web"))
 	column.add_child(quit)
@@ -192,6 +197,11 @@ func _info(which: String) -> void:
 	var screen = InfoScreen.new()
 	add_child(screen)
 	screen.open(_pack(), which, func(): go.grab_focus())
+
+func _open_settings() -> void:
+	var screen = SettingsScreen.new()
+	add_child(screen)
+	screen.open(main, _pack(), func(): go.grab_focus())
 
 func _row(parent: Control) -> HBoxContainer:
 	var row = HBoxContainer.new()

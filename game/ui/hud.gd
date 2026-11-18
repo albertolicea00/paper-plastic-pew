@@ -36,6 +36,7 @@ func _ready() -> void:
 	sheet.add_child(sheet_body)
 	resume = _button("Resume", func(): game.set_paused(false))
 	view_button = _button("", _cycle_view)
+	_button("Settings", _open_settings)
 	_button("Controls", func(): _info("controls"))
 	_button("Credits", func(): _info("credits"))
 	_button("Restart", func(): game.main.start(game.config))
@@ -45,6 +46,11 @@ func _info(which: String) -> void:
 	var screen = InfoScreen.new()
 	add_child(screen)
 	screen.open(game.dimensions.active, which, Callable())
+
+func _open_settings() -> void:
+	var screen = SettingsScreen.new()
+	add_child(screen)
+	screen.open(game.main, game.dimensions.active, Callable())
 
 func _button(text: String, action: Callable) -> Button:
 	var button = Button.new()
@@ -203,6 +209,9 @@ func _draw() -> void:
 	var fg = pack.color("ui_fg")
 	var accent = pack.color("ui_accent")
 	var director = game.director
+	# Optional FPS counter, bottom left (Settings → Show FPS).
+	if game.main.settings.get("fps", false):
+		_text(Vector2(left, size.y - inset[3] - 16.0), "%d FPS" % Engine.get_frames_per_second(), 16, Color(fg, 0.8), HORIZONTAL_ALIGNMENT_LEFT, 5)
 	# Health and weapon, top left.
 	_bar(Rect2(left, top, 300, 34), player.health / player.max_health, pack.color("ui_danger") if player.health < 35 else pack.color("pickup_health"))
 	_text(Vector2(left + 14, top + 25), "%d" % ceilf(player.health), 20, fg, HORIZONTAL_ALIGNMENT_LEFT, 6)

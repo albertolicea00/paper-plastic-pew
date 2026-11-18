@@ -19,8 +19,9 @@ var menu: MainMenu
 var game: GameMatch
 var options: Dictionary = {}
 var best: Dictionary = {}
-# Player options, kept between runs. view: top | shoulder | weapon
-var settings: Dictionary = {"view": "top"}
+# Player options, kept between runs and applied by _apply_settings().
+# view: top | shoulder | weapon; quality: low | high; volumes 0..1.
+var settings: Dictionary = {"view": "top", "music": 0.6, "sfx": 0.8, "touch": false, "fullscreen": false, "fps": false, "quality": "high"}
 
 func _ready() -> void:
 	for argument in OS.get_cmdline_user_args():
@@ -40,6 +41,7 @@ func _ready() -> void:
 			best[mode] = save.get_value("best", mode, 0)
 		for key in settings.keys():
 			settings[key] = save.get_value("settings", key, settings[key])
+	_apply_settings()
 	if options.has("smoke"):
 		add_child(Smoke.new())
 	elif options.has("mode"):
@@ -72,7 +74,7 @@ func show_menu() -> void:
 func start(config: Dictionary) -> void:
 	_clear()
 	var full = config.duplicate()
-	if options.has("touch") or OS.has_feature("mobile"):
+	if options.has("touch") or OS.has_feature("mobile") or settings.get("touch", false):
 		full["touch"] = true
 	if options.has("view"):
 		full["view"] = options.view
@@ -88,8 +90,23 @@ func record(mode: String, score: int) -> void:
 
 func set_setting(key: String, value) -> void:
 	settings[key] = value
+	_apply_settings()
 	if not options.has("smoke"):
 		_save()
+
+# Push the stored settings into the systems that use them.
+func _apply_settings() -> void:
+	if not options.has("mute"):
+		sfx.music_volume = float(settings.get("music", 0.6))
+		sfx.effects_volume = float(settings.get("sfx", 0.8))
+	if not OS.has_feature("mobile") and not options.has("capture"):
+		var mode = DisplayServer.WINDOW_MODE_FULLSCREEN if settings.get("fullscreen", false) else DisplayServer.WINDOW_MODE_WINDOWED
+		if DisplayServer.window_get_mode() != mode:
+			DisplayServer.window_set_mode(mode)
+	var viewport = get_viewport()
+	var low = settings.get("quality", "high") == "low"
+	viewport.msaa_3d = Viewport.MSAA_DISABLED if low else Viewport.MSAA_2X
+	viewport.scaling_3d_scale = 0.75 if low else 1.0
 
 func _save() -> void:
 	var save = ConfigFile.new()
