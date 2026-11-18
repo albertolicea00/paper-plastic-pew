@@ -9,6 +9,7 @@ var spawns: Array[Vector3] = []
 var player_start = Vector3.ZERO
 var title = ""
 var blocks: Array[Dictionary] = []
+var borders: Array[Dictionary] = []
 var scenery: Node3D
 
 func build(spec: Dictionary) -> void:
@@ -29,8 +30,8 @@ func build(spec: Dictionary) -> void:
 				_mesh(tile, Vector3(-size.x * 0.5 + 2 + x * 4, 0.01, -size.y * 0.5 + 2 + z * 4), "floor", "floor_alt")
 	for side in [-1, 1]:
 		# The wall nearest the camera stays low so it never hides the player.
-		_block(Vector3(0, 0, side * (size.y * 0.5 + 0.5)), Vector3(size.x + 2, WALL_HEIGHT if side < 0 else 1.2, 1), "wall", "wall", "box")
-		_block(Vector3(side * (size.x * 0.5 + 0.5), 0, 0), Vector3(1, WALL_HEIGHT, size.y), "wall", "wall", "box")
+		_border(Vector3(0, 0, side * (size.y * 0.5 + 0.5)), Vector3(size.x + 2, WALL_HEIGHT if side < 0 else 1.2, 1))
+		_border(Vector3(side * (size.x * 0.5 + 0.5), 0, 0), Vector3(1, WALL_HEIGHT, size.y))
 	for block in spec.get("blocks", []):
 		var role: String = block.get("role", "wall")
 		_block(Vector3(block.at[0], 0, block.at[1]), Vector3(block.size[0], block.size[1], block.size[2]), role, block.get("color", role), block.get("shape", "box"), true)
@@ -46,9 +47,30 @@ func rebuild() -> void:
 		for child in block.holder.get_children():
 			child.free()
 		builder.block(block.holder, block.extent, block.shape, block.role, block.color)
+	for border in borders:
+		for child in border.holder.get_children():
+			child.free()
+		builder.border(border.holder, border.extent)
 	for child in scenery.get_children():
 		child.free()
 	builder.decorate(scenery, self)
+
+# A boundary wall: collision box plus a holder the builder dresses.
+func _border(at: Vector3, extent: Vector3) -> void:
+	var body = StaticBody3D.new()
+	body.position = at + Vector3(0, extent.y * 0.5, 0)
+	body.collision_layer = 1
+	body.collision_mask = 0
+	add_child(body)
+	var collider = CollisionShape3D.new()
+	var shape = BoxShape3D.new()
+	shape.size = extent
+	collider.shape = shape
+	body.add_child(collider)
+	var holder = Node3D.new()
+	holder.position = at
+	add_child(holder)
+	borders.append({"holder": holder, "extent": extent})
 
 func _mesh(mesh: Mesh, at: Vector3, role: String, color_key: String) -> MeshInstance3D:
 	var node = MeshInstance3D.new()

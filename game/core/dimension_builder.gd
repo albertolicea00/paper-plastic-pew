@@ -47,6 +47,13 @@ func block(holder: Node3D, extent: Vector3, shape: String, role: String, color_k
 	var mesh = cylinder(extent.x * 0.5, extent.y) if shape == "cylinder" else box(extent)
 	add(holder, mesh, Vector3(0, extent.y * 0.5, 0), role, color_key)
 
+## Build an arena boundary wall under `holder` (centre of its floor footprint).
+## `extent` is the full collision size. Default: a plain wall box, tinted with
+## the "wall" palette key. Packs override to fence the arena in their own style;
+## keep it cheap, border runs the whole perimeter.
+func border(holder: Node3D, extent: Vector3) -> void:
+	add(holder, box(extent), Vector3(0, extent.y * 0.5, 0), "wall", "wall")
+
 ## Build a pickup under `holder` (it spins and bobs by itself), about 0.6 wide.
 ## `what` is "health" or a weapon id (scatter, rapid, launcher).
 func pickup(holder: Node3D, what: String) -> void:
