@@ -1,0 +1,31 @@
+{
+	"id": "stick", "name": "Stickman", "family": "Paper", "order": 6,
+	"tagline": "Hand-drawn stick fighters on the page",
+	"palette": {
+		"bg": "#e7e1d0", "floor": "#fbf7ec", "floor_alt": "#f0ead8", "wall": "#4a5a73", "prop": "#c96a2e",
+		"player": "#2f6fd6", "player_accent": "#141414", "grunt": "#d23b32", "runner": "#1f9d57",
+		"tank": "#7a3fb0", "boss": "#141414", "bot": "#e08a1e", "weapon": "#1a1a1a", "ink": "#141414",
+		"bullet_player": "#1b8ff0", "bullet_enemy": "#ff3b5c", "pickup_health": "#e8435f", "pickup_ammo": "#f2a71b",
+		"flash": "#ffffff", "ui_bg": "#fbf7ec", "ui_fg": "#1a1a1a", "ui_accent": "#d23b32", "ui_danger": "#e8435f"
+	},
+	"environment": {"ambient": "#ffffff", "ambient_energy": 0.55, "light": "#ffffff", "light_energy": 1.0, "light_pitch": -60, "light_yaw": -30, "shadows": true},
+	"surface_shader": "surface.gdshader",
+	"surface_params": {"flat_fill": 0.82, "shade": 0.74, "grain": 0.0, "grain_scale": 40.0, "glow": 0.0},
+	"roles": {
+		"floor": {"shader": "floor.gdshader", "params": {"ink": "#2f4a86", "cell": 1.0, "line": 0.022, "major": 5.0, "line_fade": 0.42, "grain": 0.02, "shade_floor": 0.84}},
+		"wall": {"params": {"grain": 0.12, "grain_scale": 26.0}, "outline_width": 0.05},
+		"prop": {"params": {"grain": 0.14, "grain_scale": 30.0}, "outline_width": 0.045},
+		"character": {"params": {"grain": 0.0}, "outline_width": 0.055},
+		"weapon": {"params": {"grain": 0.0}, "outline_width": 0.03},
+		"pickup": {"params": {"grain": 0.0}, "outline_width": 0.05},
+		"bullet": {"params": {"glow": 1.0}}
+	},
+	"outline": {"width": 0.055, "color": "@ink", "shader": "outline.gdshader", "params": {"wobble": 0.4}},
+	"overlay": {"shader": "overlay.gdshader", "params": {"ink": "#1a1a1a", "margin": "#d23b32", "grain": 0.03, "vignette": 0.34, "strength": 0.9}},
+	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {"blaster": "Ink Pen", "scatter": "Scribble Spray", "rapid": "Scratch Repeater", "launcher": "Blot Bomb"},
+	"hud": {"radius": 8, "border": 2, "shadow": 2, "tilt": 1.0, "uppercase": false, "font_scale": 1.0},
+	"feel": {"hitstop": 0.05, "shake": 1.2},
+	"desk": {"object": "sketchbook", "cover": "@wall", "pages": "@floor", "art": "@prop", "accent": "@ui_accent"}
+}
