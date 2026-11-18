@@ -182,102 +182,26 @@ func _draw_mouse(c: Control, at: Vector2, side: Vector2) -> void:
 	c.draw_line(at + Vector2(side.x * 0.5, 2), at + Vector2(side.x * 0.5, side.y * 0.42), ink, 3.0)
 	_center(c, "FIRE", at + Vector2(side.x * 0.5, side.y + 16), 14, pack.color("ui_fg"))
 
-# Two controllers side by side: Xbox (lettered buttons) and PlayStation (shapes).
+# Real controller art from the Kenney Input Prompts pack (CC0), with the action
+# mapping as a legend beneath — the standard way a control screen reads.
+const XBOX_TEX = preload("res://assets/ui/controllers/xbox.png")
+const PS_TEX = preload("res://assets/ui/controllers/playstation.png")
+
 func _draw_gamepad(c: Control, r: Rect2) -> void:
-	var w = minf(r.size.x * 0.44, 440.0)
-	var y = r.position.y + r.size.y * 0.40
-	_controller(c, Vector2(r.position.x + r.size.x * 0.27, y), w, "xbox")
-	_controller(c, Vector2(r.position.x + r.size.x * 0.73, y), w, "play")
-	# Shared legend under both.
-	var legend = r.position + Vector2(r.size.x * 0.5, r.size.y * 0.90)
-	_caption(c, legend + Vector2(0, -16), "LEFT STICK MOVE   ·   RIGHT STICK AIM & FIRE", pack.color("ui_accent"))
-	_caption(c, legend + Vector2(0, 8), "TOP BUTTON SWAP   ·   BOTTOM BUTTON DASH   ·   START PAUSE   ·   BACK VIEW", Color(pack.color("ui_fg"), 0.85))
+	var s = minf(r.size.x * 0.40, 360.0)
+	var y = r.position.y + r.size.y * 0.42
+	_pad_image(c, XBOX_TEX, "XBOX", Vector2(r.position.x + r.size.x * 0.28, y), s)
+	_pad_image(c, PS_TEX, "PLAYSTATION", Vector2(r.position.x + r.size.x * 0.72, y), s)
+	var legend = r.position + Vector2(r.size.x * 0.5, r.size.y * 0.92)
+	_caption(c, legend + Vector2(0, -32), "LEFT STICK MOVE   ·   RIGHT STICK AIM & FIRE", pack.color("ui_accent"))
+	_caption(c, legend + Vector2(0, -8), "A / CROSS DASH   ·   Y / TRIANGLE SWAP   ·   BUMPERS HELP MOVE", Color(pack.color("ui_fg"), 0.85))
+	_caption(c, legend + Vector2(0, 16), "START PAUSE   ·   BACK / SHARE CHANGE VIEW", Color(pack.color("ui_fg"), 0.85))
 
-# Half-silhouette of each pad (right side, top->bottom), in a unit frame where
-# the body half-width is ~1. Xbox: central hump, shorter angled grips.
-# PlayStation: flatter top, longer curved wings. Mirrored and smoothed to draw.
-const XBOX_HALF = [Vector2(0.0, -0.50), Vector2(0.20, -0.52), Vector2(0.40, -0.44), Vector2(0.52, -0.52),
-	Vector2(0.74, -0.44), Vector2(0.96, -0.20), Vector2(1.04, 0.10), Vector2(0.96, 0.42),
-	Vector2(0.74, 0.58), Vector2(0.52, 0.50), Vector2(0.40, 0.26), Vector2(0.20, 0.36), Vector2(0.0, 0.40)]
-const PLAY_HALF = [Vector2(0.0, -0.46), Vector2(0.26, -0.48), Vector2(0.52, -0.44), Vector2(0.76, -0.34),
-	Vector2(0.96, -0.12), Vector2(1.08, 0.18), Vector2(1.02, 0.50), Vector2(0.80, 0.68),
-	Vector2(0.56, 0.60), Vector2(0.42, 0.30), Vector2(0.20, 0.40), Vector2(0.0, 0.44)]
-
-func _controller(c: Control, mid: Vector2, w: float, platform: String) -> void:
-	var ink = pack.color("ink")
-	var shell = pack.color("ui_bg").lightened(0.12)
-	_caption(c, mid + Vector2(0, -116), "XBOX" if platform == "xbox" else "PLAYSTATION", pack.color("ui_fg"))
-	var outline = _pad_outline(XBOX_HALF if platform == "xbox" else PLAY_HALF, mid, w * 0.5, w * 0.42)
-	c.draw_colored_polygon(outline, shell)
-	c.draw_polyline(outline + PackedVector2Array([outline[0]]), ink, 4.0, true)
-	# Bumpers on the top edge.
-	for s in [-1, 1]:
-		var tag = ("LB" if s < 0 else "RB") if platform == "xbox" else ("L1" if s < 0 else "R1")
-		_cap(c, mid + Vector2(s * w * 0.28 - 28, -78), Vector2(56, 24), tag)
-	# Layout differs: Xbox offsets the left stick up; PlayStation puts both low.
-	var face = mid + Vector2(w * 0.3, -14)
-	if platform == "xbox":
-		_stick(c, mid + Vector2(-w * 0.3, -14), 26, "")
-		_dpad(c, mid + Vector2(-w * 0.16, 30), 13)
-		_stick(c, mid + Vector2(w * 0.08, 30), 24, "")
-	else:
-		_dpad(c, mid + Vector2(-w * 0.3, -14), 13)
-		_stick(c, mid + Vector2(-w * 0.12, 32), 24, "")
-		_stick(c, mid + Vector2(w * 0.12, 32), 24, "")
-	# Face buttons: Xbox letters, PlayStation shapes. Top=swap, bottom=dash.
-	if platform == "xbox":
-		_face(c, face + Vector2(0, 26), "A", Color("#6ab04c"))
-		_face(c, face + Vector2(26, 0), "B", Color("#d84a52"))
-		_face(c, face + Vector2(-26, 0), "X", Color("#4a7fd0"))
-		_face(c, face + Vector2(0, -26), "Y", Color("#e6b800"))
-	else:
-		_ps_button(c, face + Vector2(0, 26), "cross", Color("#8aa0d8"))
-		_ps_button(c, face + Vector2(26, 0), "circle", Color("#d84a52"))
-		_ps_button(c, face + Vector2(-26, 0), "square", Color("#d858a8"))
-		_ps_button(c, face + Vector2(0, -26), "triangle", Color("#3fb58a"))
-
-# Mirror a right-half profile into a full closed loop, scale, and smooth it.
-func _pad_outline(half: Array, mid: Vector2, sx: float, sy: float) -> PackedVector2Array:
-	var loop = PackedVector2Array()
-	for p in half:
-		loop.append(mid + Vector2(p.x * sx, p.y * sy))
-	for i in range(half.size() - 2, 0, -1):
-		loop.append(mid + Vector2(-half[i].x * sx, half[i].y * sy))
-	return _smooth(loop)
-
-# Catmull-Rom through a closed set of points, for a soft hand-drawn curve.
-func _smooth(points: PackedVector2Array) -> PackedVector2Array:
-	var out = PackedVector2Array()
-	var n = points.size()
-	for i in n:
-		var p0 = points[(i - 1 + n) % n]
-		var p1 = points[i]
-		var p2 = points[(i + 1) % n]
-		var p3 = points[(i + 2) % n]
-		for s in 6:
-			var t = s / 6.0
-			var t2 = t * t
-			var t3 = t2 * t
-			out.append(0.5 * ((2.0 * p1) + (p2 - p0) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (3.0 * p1 - p0 - 3.0 * p2 + p3) * t3))
-	return out
-
-func _ps_button(c: Control, at: Vector2, glyph: String, tone: Color) -> void:
-	var ink = pack.color("ink")
-	c.draw_circle(at, 15, pack.color("ui_bg").darkened(0.15))
-	c.draw_arc(at, 15, 0, TAU, 22, ink, 2.5, true)
-	var k = 6.0
-	match glyph:
-		"cross":
-			c.draw_line(at + Vector2(-k, -k), at + Vector2(k, k), tone, 3.0, true)
-			c.draw_line(at + Vector2(k, -k), at + Vector2(-k, k), tone, 3.0, true)
-		"circle":
-			c.draw_arc(at, k + 1, 0, TAU, 20, tone, 3.0, true)
-		"square":
-			c.draw_rect(Rect2(at - Vector2(k, k), Vector2(k, k) * 2), tone, false, 3.0)
-		"triangle":
-			var pts = PackedVector2Array([at + Vector2(0, -k - 1), at + Vector2(k + 1, k), at + Vector2(-k - 1, k)])
-			for i in 3:
-				c.draw_line(pts[i], pts[(i + 1) % 3], tone, 3.0, true)
+# One controller illustration, centred, with its name above.
+func _pad_image(c: Control, tex: Texture2D, name: String, mid: Vector2, s: float) -> void:
+	_caption(c, mid + Vector2(0, -s * 0.5 - 16), name, pack.color("ui_fg"))
+	# Tint the white Kenney art to the theme's foreground so it shows on any page.
+	c.draw_texture_rect(tex, Rect2(mid - Vector2(s * 0.5, s * 0.5), Vector2(s, s)), false, pack.color("ui_fg"))
 
 func _stick(c: Control, at: Vector2, radius: float, label: String) -> void:
 	var ink = pack.color("ink")
@@ -287,19 +211,6 @@ func _stick(c: Control, at: Vector2, radius: float, label: String) -> void:
 	c.draw_circle(at, radius * 0.55, pack.color("ui_accent"))
 	c.draw_arc(at, radius * 0.55, 0, TAU, 24, ink, 2.5, true)
 	_center(c, label, at + Vector2(0, radius + 16), 13, pack.color("ui_fg"))
-
-func _dpad(c: Control, at: Vector2, arm: float) -> void:
-	var ink = pack.color("ink")
-	var fill = pack.color("ui_bg").lightened(0.2)
-	for rect in [Rect2(at - Vector2(arm * 0.5, arm * 1.5), Vector2(arm, arm * 3)), Rect2(at - Vector2(arm * 1.5, arm * 0.5), Vector2(arm * 3, arm))]:
-		c.draw_rect(rect, fill)
-		c.draw_rect(rect, ink, false, 2.5)
-
-func _face(c: Control, at: Vector2, label: String, tone: Color) -> void:
-	var ink = pack.color("ink")
-	c.draw_circle(at, 15, tone)
-	c.draw_arc(at, 15, 0, TAU, 20, ink, 2.5, true)
-	_center(c, label, at, 15, _contrast(tone))
 
 func _draw_touch(c: Control, r: Rect2) -> void:
 	var ink = pack.color("ink")
