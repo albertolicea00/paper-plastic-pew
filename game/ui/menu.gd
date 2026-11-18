@@ -40,7 +40,6 @@ var prev: Button
 var next: Button
 var side: PanelContainer
 var mode_buttons: Array[Button] = []
-var note: Label
 var level_buttons: Array[Button] = []
 var level_label: Label
 var info_buttons: Array[Button] = []
@@ -137,8 +136,6 @@ func _build_side() -> void:
 		button.set_meta("labels", [words.get_child(0), words.get_child(1), best])
 		column.add_child(button)
 		mode_buttons.append(button)
-	note = _label(column)
-	note.custom_minimum_size = Vector2(0, 46)
 	var levels = _row(column)
 	level_label = _label(levels, HORIZONTAL_ALIGNMENT_LEFT)
 	level_label.custom_minimum_size = Vector2(92, 0)
@@ -365,8 +362,6 @@ func _refresh() -> void:
 		var room = inner - (labels[2].get_minimum_size().x + 8.0 if score > 0 else 0.0)
 		_write(labels[0], MODES[i][1], 23, tone, room)
 		_write(labels[1], MODES[i][2], 15, Color(tone, 0.85), room)
-	var world = pack.title
-	_write(note, "Visits ALL dimensions\nStarting world: %s" % world if everywhere else "One dimension\nPlayed entirely in %s" % world, 15, accent if everywhere else fg, inner + 32.0)
 	_write(level_label, "Difficulty", 16, fg, 92.0)
 	for i in LEVELS.size():
 		_skin(level_buttons[i], i == level, 18)
