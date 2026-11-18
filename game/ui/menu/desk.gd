@@ -116,9 +116,8 @@ func _aim() -> Transform3D:
 	var need = SPACING * 2.0 + 3.4
 	var distance = clampf(need * view.y / (maxf(open_area.size.x, 200.0) * 2.0 * tan_half), NEAR, FAR)
 	var per_pixel = 2.0 * distance * tan_half / view.y
-	# Longer rows scroll: follow the pick only as far as the row overflows.
-	var overflow = maxf(0.0, (packs.size() - 1) * SPACING * 0.5 + 1.7 - open_area.size.x * per_pixel * 0.5)
-	var target = Vector3(clampf(slot(selected).x, -overflow, overflow) + slot(selected).x * 0.08, 0.5, 0.0)
+	# The carousel keeps the selected object centred, so the camera stays put.
+	var target = Vector3(0.0, 0.5, 0.0)
 	var pitch = deg_to_rad(PITCH)
 	var look = Basis(Vector3.RIGHT, -pitch)
 	var off = open_area.get_center() - view * 0.5
@@ -137,12 +136,30 @@ func _process(delta: float) -> void:
 	sun.light_color = sun.light_color.lerp(Color.html(str(env.light)), blend)
 	sun.light_energy = lerpf(sun.light_energy, float(env.light_energy), blend)
 	glow.albedo_color = glow.albedo_color.lerp(mood.color("ui_accent"), blend)
-	ring.position = ring.position.lerp(slot(selected) + Vector3(0, 0.01, 0.1), blend)
+	ring.position = ring.position.lerp(Vector3(0, 0.04, 0.1), blend)
 	var pulse = 1.0 + sin(clock * 2.4) * 0.03
 	ring.scale = Vector3(pulse, 0.05, pulse)
+	# Carousel: each object slides to its circular offset from the selected one,
+	# teleporting only when it wraps around the far side (off-screen).
 	for i in objects.size():
+		var target_x = _slot_x(i)
+		var current_x = objects[i].position.x
+		if not settled or absf(current_x - target_x) > SPACING * 1.6:
+			objects[i].position.x = target_x
+		else:
+			objects[i].position.x = lerpf(current_x, target_x, 1.0 - exp(-delta * 8.0))
 		objects[i].pose(delta if settled else 10.0, i == selected, i == hovered, 0.16 if all_worlds else 0.0, clock)
 	settled = true
+
+# Signed shortest number of steps from the selected object to object i, as an x.
+func _slot_x(i: int) -> float:
+	var n = objects.size()
+	var d = (i - selected) % n
+	if d < 0:
+		d += n
+	if float(d) > n * 0.5:
+		d -= n
+	return d * SPACING
 
 ## Where an object sits on screen, in menu (canvas) coordinates.
 func screen_point(index: int, height: float = 0.4) -> Vector2:
