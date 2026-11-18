@@ -193,25 +193,27 @@ func _draw_gamepad(c: Control, r: Rect2) -> void:
 	_caption(c, legend + Vector2(0, -16), "LEFT STICK MOVE   ·   RIGHT STICK AIM & FIRE", pack.color("ui_accent"))
 	_caption(c, legend + Vector2(0, 8), "TOP BUTTON SWAP   ·   BOTTOM BUTTON DASH   ·   START PAUSE   ·   BACK VIEW", Color(pack.color("ui_fg"), 0.85))
 
+# Half-silhouette of each pad (right side, top->bottom), in a unit frame where
+# the body half-width is ~1. Xbox: central hump, shorter angled grips.
+# PlayStation: flatter top, longer curved wings. Mirrored and smoothed to draw.
+const XBOX_HALF = [Vector2(0.0, -0.50), Vector2(0.20, -0.52), Vector2(0.40, -0.44), Vector2(0.52, -0.52),
+	Vector2(0.74, -0.44), Vector2(0.96, -0.20), Vector2(1.04, 0.10), Vector2(0.96, 0.42),
+	Vector2(0.74, 0.58), Vector2(0.52, 0.50), Vector2(0.40, 0.26), Vector2(0.20, 0.36), Vector2(0.0, 0.40)]
+const PLAY_HALF = [Vector2(0.0, -0.46), Vector2(0.26, -0.48), Vector2(0.52, -0.44), Vector2(0.76, -0.34),
+	Vector2(0.96, -0.12), Vector2(1.08, 0.18), Vector2(1.02, 0.50), Vector2(0.80, 0.68),
+	Vector2(0.56, 0.60), Vector2(0.42, 0.30), Vector2(0.20, 0.40), Vector2(0.0, 0.44)]
+
 func _controller(c: Control, mid: Vector2, w: float, platform: String) -> void:
 	var ink = pack.color("ink")
 	var shell = pack.color("ui_bg").lightened(0.12)
 	_caption(c, mid + Vector2(0, -116), "XBOX" if platform == "xbox" else "PLAYSTATION", pack.color("ui_fg"))
-	# Two grips first, so the body overlaps their tops into one silhouette.
-	for s in [-1, 1]:
-		var grip = mid + Vector2(s * w * 0.34, 52)
-		c.draw_circle(grip, 40, shell)
-		c.draw_arc(grip, 40, 0, TAU, 28, ink, 4.0, true)
-	var body = StyleBoxFlat.new()
-	body.bg_color = shell
-	body.border_color = ink
-	body.set_border_width_all(4)
-	body.set_corner_radius_all(52)
-	body.draw(c.get_canvas_item(), Rect2(mid - Vector2(w * 0.5, 56), Vector2(w, 112)))
+	var outline = _pad_outline(XBOX_HALF if platform == "xbox" else PLAY_HALF, mid, w * 0.5, w * 0.42)
+	c.draw_colored_polygon(outline, shell)
+	c.draw_polyline(outline + PackedVector2Array([outline[0]]), ink, 4.0, true)
 	# Bumpers on the top edge.
 	for s in [-1, 1]:
 		var tag = ("LB" if s < 0 else "RB") if platform == "xbox" else ("L1" if s < 0 else "R1")
-		_cap(c, mid + Vector2(s * w * 0.3 - 28, -84), Vector2(56, 24), tag)
+		_cap(c, mid + Vector2(s * w * 0.28 - 28, -78), Vector2(56, 24), tag)
 	# Layout differs: Xbox offsets the left stick up; PlayStation puts both low.
 	var face = mid + Vector2(w * 0.3, -14)
 	if platform == "xbox":
@@ -233,6 +235,31 @@ func _controller(c: Control, mid: Vector2, w: float, platform: String) -> void:
 		_ps_button(c, face + Vector2(26, 0), "circle", Color("#d84a52"))
 		_ps_button(c, face + Vector2(-26, 0), "square", Color("#d858a8"))
 		_ps_button(c, face + Vector2(0, -26), "triangle", Color("#3fb58a"))
+
+# Mirror a right-half profile into a full closed loop, scale, and smooth it.
+func _pad_outline(half: Array, mid: Vector2, sx: float, sy: float) -> PackedVector2Array:
+	var loop = PackedVector2Array()
+	for p in half:
+		loop.append(mid + Vector2(p.x * sx, p.y * sy))
+	for i in range(half.size() - 2, 0, -1):
+		loop.append(mid + Vector2(-half[i].x * sx, half[i].y * sy))
+	return _smooth(loop)
+
+# Catmull-Rom through a closed set of points, for a soft hand-drawn curve.
+func _smooth(points: PackedVector2Array) -> PackedVector2Array:
+	var out = PackedVector2Array()
+	var n = points.size()
+	for i in n:
+		var p0 = points[(i - 1 + n) % n]
+		var p1 = points[i]
+		var p2 = points[(i + 1) % n]
+		var p3 = points[(i + 2) % n]
+		for s in 6:
+			var t = s / 6.0
+			var t2 = t * t
+			var t3 = t2 * t
+			out.append(0.5 * ((2.0 * p1) + (p2 - p0) * t + (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3) * t2 + (3.0 * p1 - p0 - 3.0 * p2 + p3) * t3))
+	return out
 
 func _ps_button(c: Control, at: Vector2, glyph: String, tone: Color) -> void:
 	var ink = pack.color("ink")
