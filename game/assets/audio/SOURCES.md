@@ -27,6 +27,7 @@ Kenney packs are downloaded from the "Download" button on each pack page; the au
 | `assets/audio/win.wav` | `zapThreeToneUp.ogg` | Digital Audio | Kenney | CC0 | https://kenney.nl/assets/digital-audio | `volume=-4dB` |
 | `assets/audio/lose.wav` | `zapThreeToneDown.ogg` | Digital Audio | Kenney | CC0 | https://kenney.nl/assets/digital-audio | `volume=-5dB` |
 | `assets/audio/swap.ogg` | `switch_003.ogg` | Interface Sounds | Kenney | CC0 | https://kenney.nl/assets/interface-sounds | copy |
+| `assets/audio/heartbeat.ogg` | `heartbeat_fast_0.wav` | Heartbeat sounds | bart | CC0 | https://opengameart.org/content/heartbeat-sounds | converted to OGG Vorbis (`-c:a vorbis -q:a 4`) |
 | `dimensions/clay/audio/hit.wav` | `impactSoft_medium_000.ogg` | Impact Sounds | Kenney | CC0 | https://kenney.nl/assets/impact-sounds | `volume=-3dB` |
 | `dimensions/clay/audio/die.ogg` | `slime_000.ogg` | Sci-Fi Sounds (1.0) | Kenney | CC0 | https://kenney.nl/assets/sci-fi-sounds | copy |
 
@@ -37,4 +38,6 @@ Kenney packs are downloaded from the "Download" button on each pack page; the au
 | `dimensions/anime/audio/music.ogg` | `Action3 - Preparing For Battle.ogg` in `JRPG Music Pack #5 [Action] by Juhani Junkala.zip` | JRPG Pack 5 Action | Juhani Junkala (SubspaceAudio) | CC0 | https://opengameart.org/content/jrpg-pack-5-action | copy |
 | `dimensions/cartoon/audio/music.ogg` | `carnivalrides.ogg` | Carnival Rides | Écrivain | CC0 | https://opengameart.org/content/carnival-rides | copy |
 | `dimensions/clay/audio/music.ogg` | `WereWasI_0.ogg` | Where was I? | yd | CC0 | https://opengameart.org/content/where-was-i | copy |
+| `dimensions/blocks/audio/music.ogg` | `Children's March Theme.ogg` in `childrens_march_theme.zip` | Children's March Theme | Cleyton Kauffman | CC0 | https://opengameart.org/content/childrens-march-theme | copy |
 | `assets/audio/music.ogg` | `8bit attempt.ogg` | Summer Park - 8bit tune (loop) | Scribe (Daniel Stephens) | CC0 | https://opengameart.org/content/summer-park-8bit-tune-loop | copy |
+| `assets/audio/menu.ogg` | `Ambient-Loop-isaiah658_0.ogg` | Ambient Relaxing Loop | isaiah658 | CC0 | https://opengameart.org/content/ambient-relaxing-loop | copy |

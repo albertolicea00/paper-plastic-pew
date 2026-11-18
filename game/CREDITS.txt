@@ -37,9 +37,18 @@ dimensions/clay/font.ttf
   Licence: SIL Open Font License 1.1
   Source:  https://github.com/google/fonts/tree/main/ofl/lilitaone
 
+dimensions/blocks/font.ttf
+  Title:   Titan One (TitanOne-Regular.ttf)
+  Author:  Copyright (c) 2011, Rodrigo Fuenzalida
+           (www.rfuenzalida.com|hello@rfuenzalida.com), with Reserved Font
+           Name Titan
+  Licence: SIL Open Font License 1.1
+  Source:  https://github.com/google/fonts/tree/main/ofl/titanone
+
 SOUND EFFECTS
 -------------
-All sound effects are by Kenney (www.kenney.nl) and released under Creative
+Except for the low-health heartbeat (credited at the end of this section), all
+sound effects are by Kenney (www.kenney.nl) and released under Creative
 Commons Zero (CC0 1.0, public domain dedication):
 https://creativecommons.org/publicdomain/zero/1.0/
 Some files were trimmed, faded, level-adjusted or converted to mono WAV.
@@ -64,6 +73,10 @@ Impact Sounds, Kenney, CC0
 Interface Sounds, Kenney, CC0
   https://kenney.nl/assets/interface-sounds
   assets/audio/swap.ogg
+
+Heartbeat sounds, bart, CC0
+  https://opengameart.org/content/heartbeat-sounds
+  assets/audio/heartbeat.ogg (converted from heartbeat_fast_0.wav to OGG Vorbis)
 
 MUSIC
 -----
@@ -90,8 +103,20 @@ dimensions/clay/audio/music.ogg
   Licence: CC0 1.0
   Source:  https://opengameart.org/content/where-was-i
 
+dimensions/blocks/audio/music.ogg
+  Title:   Children's March Theme
+  Author:  Cleyton Kauffman
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/childrens-march-theme
+
 assets/audio/music.ogg (default for packs without their own music)
   Title:   Summer Park - 8bit tune (loop)
   Author:  Scribe (Daniel Stephens)
   Licence: CC0 1.0
   Source:  https://opengameart.org/content/summer-park-8bit-tune-loop
+
+assets/audio/menu.ogg (main-menu hub theme)
+  Title:   Ambient Relaxing Loop
+  Author:  isaiah658
+  Licence: CC0 1.0
+  Source:  https://opengameart.org/content/ambient-relaxing-loop
