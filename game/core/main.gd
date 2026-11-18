@@ -46,7 +46,7 @@ func _ready() -> void:
 		add_child(Smoke.new())
 	elif options.has("mode"):
 		start({"mode": options.mode, "dimension": options.get("dimension", dimensions.active.id), "arena": options.get("arena", ""),
-			"bots": int(options.get("bots", "4")), "autopilot": options.has("autopilot") or options.has("capture")})
+			"bots": int(options.get("bots", "4")), "endless": options.has("endless"), "autopilot": options.has("autopilot") or options.has("capture")})
 	else:
 		show_menu()
 	if options.has("capture"):

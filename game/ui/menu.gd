@@ -27,6 +27,9 @@ var packs: Array = []
 var pick = 0
 var mode = 0
 var level = 1
+var endless = false
+var map_row: HBoxContainer
+var map_buttons: Array[Button] = []
 var bots = 4
 var desk: MenuDesk
 var title: Label
@@ -158,6 +161,17 @@ func _build_side() -> void:
 		button.set_meta("row", true)
 		views.add_child(button)
 		view_buttons.append(button)
+	map_row = _row(column)
+	var map_label = _label(map_row, HORIZONTAL_ALIGNMENT_LEFT)
+	map_label.custom_minimum_size = Vector2(92, 0)
+	map_label.set_meta("map_label", true)
+	for choice in [[false, "Fixed"], [true, "Endless"]]:
+		var button = _button(choice[1], func(): endless = choice[0])
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.set_meta("row", true)
+		button.set_meta("endless", choice[0])
+		map_row.add_child(button)
+		map_buttons.append(button)
 	bots_row = _row(column)
 	bots_label = _label(bots_row, HORIZONTAL_ALIGNMENT_LEFT)
 	bots_label.custom_minimum_size = Vector2(92, 0)
@@ -249,7 +263,7 @@ func _set_mode(index: int, confirm: bool) -> void:
 	_refresh()
 
 func _start() -> void:
-	start_requested.emit({"mode": MODES[mode][0], "dimension": _pack().id, "bots": bots, "difficulty": level})
+	start_requested.emit({"mode": MODES[mode][0], "dimension": _pack().id, "bots": bots, "difficulty": level, "endless": endless})
 
 func _input(event: InputEvent) -> void:
 	var by = 0
@@ -373,6 +387,12 @@ func _refresh() -> void:
 	for i in VIEWS.size():
 		_skin(view_buttons[i], VIEWS[i][0] == main.settings.get("view", "top"), 18)
 		view_buttons[i].text = _case(VIEWS[i][1])
+	# Endless map is pointless for the stage-based campaign.
+	map_row.visible = MODES[mode][0] != "campaign"
+	_write(map_row.get_child(0), "Map", 16, fg, 92.0)
+	for button in map_buttons:
+		_skin(button, button.get_meta("endless") == endless, 18)
+		button.text = _case("Endless" if button.get_meta("endless") else "Fixed")
 	bots_row.visible = MODES[mode][0] == "skirmish"
 	_write(bots_label, "Bots", 16, fg, 92.0)
 	_write(bots_value, str(bots), 26, accent)
