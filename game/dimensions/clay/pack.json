@@ -23,6 +23,8 @@
 	"outline": {"width": 0.0},
 	"overlay": {"shader": "overlay.gdshader", "params": {"vignette": 0.5, "grain": 0.05, "flicker": 0.03}},
 	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {"blaster": "Clay Extruder", "scatter": "Pellet Press", "rapid": "Coil Winder", "launcher": "Lump Lobber"},
 	"hud": {"radius": 22, "border": 0, "shadow": 3, "tilt": 0.0, "uppercase": false, "font_scale": 1.0},
 	"feel": {"hitstop": 0.0, "shake": 0.6},
 	"desk": {"object": "figure", "cover": "@prop", "art": "@player", "accent": "@player_accent"}

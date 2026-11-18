@@ -1,0 +1,57 @@
+{
+	"craft_table": {
+		"name": "Craft Table", "size": [40, 26], "player": [0, 0],
+		"spawns": [[-18, -11], [18, -11], [-18, 11], [18, 11], [0, -11.5], [0, 11.5], [-18.5, -4], [18.5, 4]],
+		"blocks": [
+			{"at": [-11, -5.5], "size": [5, 2.2, 1.6], "role": "wall"},
+			{"at": [11, 5.5], "size": [5, 2.2, 1.6], "role": "wall"},
+			{"at": [-11, 5.5], "size": [1.6, 2.2, 5], "role": "wall"},
+			{"at": [11, -5.5], "size": [1.6, 2.2, 5], "role": "wall"},
+			{"at": [0, -8], "size": [5, 1.4, 1.6], "role": "prop"},
+			{"at": [0, 8], "size": [5, 1.4, 1.6], "role": "prop"},
+			{"at": [-5, 0], "size": [1.8, 1.6, 1.8], "role": "prop", "shape": "cylinder"},
+			{"at": [5, 0], "size": [1.8, 1.6, 1.8], "role": "prop", "shape": "cylinder"},
+			{"at": [-16, 0], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [16, 0], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [16, -7], "size": [1.4, 1.1, 1.4], "role": "prop"},
+			{"at": [-16, 7], "size": [1.4, 1.1, 1.4], "role": "prop"}
+		]
+	},
+	"clay_garden": {
+		"name": "Clay Garden", "size": [44, 28], "player": [0, 3],
+		"spawns": [[-20, -12], [20, -12], [-20, 12], [20, 12], [0, -12.6], [-20, 0], [20, 0], [-13, 12], [13, 12]],
+		"blocks": [
+			{"at": [0, -4], "size": [7, 2, 1.6], "role": "wall"},
+			{"at": [-9, -7], "size": [2.4, 2, 2.4], "role": "prop", "shape": "cylinder"},
+			{"at": [9, -7], "size": [2.4, 2, 2.4], "role": "prop", "shape": "cylinder"},
+			{"at": [-15, 3], "size": [2.4, 3, 2.4], "role": "wall", "shape": "cylinder"},
+			{"at": [15, 3], "size": [2.4, 3, 2.4], "role": "wall", "shape": "cylinder"},
+			{"at": [-8, 8], "size": [1.6, 2, 5], "role": "wall"},
+			{"at": [8, 8], "size": [1.6, 2, 5], "role": "wall"},
+			{"at": [0, 9.5], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [-17, -9], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [17, -9], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [-15, -3], "size": [1.6, 1.4, 1.6], "role": "prop", "shape": "cylinder"},
+			{"at": [15, -3], "size": [1.6, 1.4, 1.6], "role": "prop", "shape": "cylinder"},
+			{"at": [0, -10], "size": [5, 1.4, 1.6], "role": "prop"}
+		]
+	},
+	"kiln_yard": {
+		"name": "Kiln Yard", "size": [36, 28], "player": [0, 6],
+		"spawns": [[-16.5, -12], [16.5, -12], [-5, -12.6], [5, -12.6], [-16.5, 1], [16.5, 1], [-7, 12.5], [7, 12.5]],
+		"blocks": [
+			{"at": [0, -2], "size": [3.6, 3.2, 3.6], "role": "wall", "shape": "cylinder"},
+			{"at": [-9, -8], "size": [4, 2.4, 1.8], "role": "wall"},
+			{"at": [9, -8], "size": [4, 2.4, 1.8], "role": "wall"},
+			{"at": [-10, 4], "size": [1.8, 2.4, 4], "role": "wall"},
+			{"at": [10, 4], "size": [1.8, 2.4, 4], "role": "wall"},
+			{"at": [0, -9.5], "size": [3, 1.2, 3], "role": "prop"},
+			{"at": [-5, 3], "size": [1.4, 1.1, 1.4], "role": "prop"},
+			{"at": [5, 3], "size": [1.4, 1.1, 1.4], "role": "prop"},
+			{"at": [-14, -3], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [14, -3], "size": [1.5, 1.2, 1.5], "role": "prop", "shape": "cylinder"},
+			{"at": [-13.5, 10], "size": [1.8, 1.6, 1.8], "role": "prop", "shape": "cylinder"},
+			{"at": [13.5, 10], "size": [1.8, 1.6, 1.8], "role": "prop", "shape": "cylinder"}
+		]
+	}
+}
