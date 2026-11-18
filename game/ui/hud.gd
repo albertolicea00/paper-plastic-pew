@@ -149,11 +149,14 @@ func _panel(rect: Rect2, fill: Color, tilt: float) -> void:
 	draw_style_box(_box(pack, fill), Rect2(-rect.size * 0.5, rect.size))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
-func _text(at: Vector2, text: String, text_size: int, tone: Color, align: int = HORIZONTAL_ALIGNMENT_LEFT, outline: int = 0) -> void:
+func _text(at: Vector2, text: String, text_size: int, tone: Color, align: int = HORIZONTAL_ALIGNMENT_LEFT, outline: int = 0, max_width: float = 0.0) -> void:
 	var pack = game.dimensions.active
 	var font = _font()
 	var scaled = int(text_size * float(pack.hud.font_scale))
 	var shown = _case(text)
+	# Shrink long names (some dimensions rename weapons) so they never overrun.
+	while max_width > 0.0 and scaled > 10 and font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, scaled).x > max_width:
+		scaled -= 1
 	var width = font.get_string_size(shown, HORIZONTAL_ALIGNMENT_LEFT, -1, scaled).x
 	var origin = at - Vector2(width * (0.5 if align == HORIZONTAL_ALIGNMENT_CENTER else 1.0 if align == HORIZONTAL_ALIGNMENT_RIGHT else 0.0), 0)
 	if outline > 0:
@@ -205,8 +208,10 @@ func _draw() -> void:
 	_text(Vector2(left + 14, top + 25), "%d" % ceilf(player.health), 20, fg, HORIZONTAL_ALIGNMENT_LEFT, 6)
 	_panel(Rect2(left, top + 46, 210, 44), pack.color("ui_bg"), -1.0)
 	var rounds: int = player.ammo.get(player.weapon_id, -1)
-	_text(Vector2(left + 14, top + 77), pack.label(player.weapon_id, game.weapons[player.weapon_id].name), 22, accent)
-	_text(Vector2(left + 196, top + 77), "INF" if rounds < 0 else str(rounds), 22, fg, HORIZONTAL_ALIGNMENT_RIGHT)
+	var rounds_text = "INF" if rounds < 0 else str(rounds)
+	var rounds_width = _font().get_string_size(rounds_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x
+	_text(Vector2(left + 14, top + 77), pack.label(player.weapon_id, game.weapons[player.weapon_id].name), 22, accent, HORIZONTAL_ALIGNMENT_LEFT, 0, 196.0 - 14.0 - rounds_width - 10.0)
+	_text(Vector2(left + 196, top + 77), rounds_text, 22, fg, HORIZONTAL_ALIGNMENT_RIGHT)
 	_bar(Rect2(left, top + 98, 120, 14), 1.0 - player.dash_wait / Player.DASH_COOLDOWN, accent)
 	# Mode status, top centre.
 	var middle = size.x * 0.5
