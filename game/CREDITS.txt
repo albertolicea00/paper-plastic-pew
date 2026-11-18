@@ -59,6 +59,21 @@ dimensions/stick/font.ttf
   Licence: SIL Open Font License 1.1
   Source:  https://github.com/google/fonts/tree/main/ofl/patrickhand
 
+CONTROLLER ARTWORK
+------------------
+The controller illustrations and button glyphs on the Controls screen are by
+Kenney (www.kenney.nl) and released under Creative Commons Zero (CC0 1.0,
+public domain dedication): https://creativecommons.org/publicdomain/zero/1.0/
+The files are Kenney's original PNGs (128x128), copied unchanged.
+
+Input Prompts (1.5A), Kenney, CC0
+  https://kenney.nl/assets/input-prompts
+  assets/ui/controllers/xbox.png (Xbox Series controller),
+  assets/ui/controllers/playstation.png (PlayStation 5 / DualSense controller)
+  assets/ui/controllers/glyphs/xbox_a.png, xbox_b.png, xbox_x.png, xbox_y.png,
+  xbox_lb.png, xbox_rb.png, ps_cross.png, ps_circle.png, ps_square.png,
+  ps_triangle.png, ps_l1.png, ps_r1.png, stick.png, dpad.png
+
 SOUND EFFECTS
 -------------
 Except for the low-health heartbeat (credited at the end of this section), all
