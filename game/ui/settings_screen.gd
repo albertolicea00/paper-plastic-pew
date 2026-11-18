@@ -47,7 +47,7 @@ func open(owner_main: Node, active_pack: DimensionPack, closer: Callable) -> voi
 	column.add_child(rows)
 	_stepper("Music", "music")
 	_stepper("Sound", "sfx")
-	_choice("Camera view", "view", [["top", "Top"], ["shoulder", "Behind"], ["weapon", "Weapon"]])
+	_choice("Default view", "view", [["top", "Top"], ["shoulder", "Behind"], ["weapon", "Weapon"]])
 	_choice("Graphics", "quality", [["high", "High"], ["low", "Low"]])
 	if not OS.has_feature("mobile"):
 		_choice("Touch controls", "touch", [[false, "Off"], [true, "On"]])
