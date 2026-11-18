@@ -212,6 +212,9 @@ func _process(delta: float) -> void:
 	if not playing:
 		return
 	_update_mouse()
+	# Heartbeat rises as the player nears death (below a third of health).
+	var frac = player.health / player.max_health if player.alive else 1.0
+	sfx.danger = clampf((0.33 - frac) / 0.33, 0.0, 1.0)
 	var lead = player.aim * 2.0 if player.alive else Vector3.ZERO
 	focus = focus.lerp(arena.clamp_inside(player.global_position + lead, 3.0), 1.0 - exp(-delta * 6.0))
 	_place_camera()
@@ -241,6 +244,9 @@ func set_paused(value: bool) -> void:
 	touch.reset()
 	Input.emulate_mouse_from_touch = value
 	_update_mouse()
+	# Dip the music while paused so the menu reads as a lull.
+	sfx.duck(0.35 if value else 1.0)
+	sfx.play("swap")
 	hud.show_sheet("Paused" if value else "", "")
 
 func end(won: bool) -> void:
@@ -253,6 +259,8 @@ func end(won: bool) -> void:
 	Engine.time_scale = time_scale
 	Input.emulate_mouse_from_touch = true
 	_update_mouse()
+	sfx.danger = 0.0
+	sfx.duck(0.5)
 	sfx.play("win" if won else "lose")
 	main.record(config.get("mode", "survival"), score)
 	hud.show_sheet("Victory!" if won else "Game over", director.summary())

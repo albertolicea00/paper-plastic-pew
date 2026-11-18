@@ -60,7 +60,10 @@ func _clear() -> void:
 
 func show_menu() -> void:
 	_clear()
-	sfx.silence()
+	sfx.danger = 0.0
+	sfx.duck(1.0)
+	# The menu has its own shared tune, distinct from the dimension tracks.
+	sfx.music("menu", true)
 	menu = MainMenu.new()
 	menu.setup(self)
 	menu.start_requested.connect(start)
