@@ -20,6 +20,8 @@
 	"outline": {"width": 0.06, "color": "@ink", "shader": "outline.gdshader", "params": {"wobble": 0.3}},
 	"overlay": {"shader": "overlay.gdshader", "params": {"ink": "@ink", "tint": "#2a1a8c", "pop": "@ui_accent", "pop_dots": "#ff5a3c", "strength": 0.65, "dots": 44.0, "frame": 0.008}},
 	"animator": "animator.gd",
+	"builder": "builder.gd",
+	"names": {"blaster": "Ray-O-Zap", "scatter": "Pie Splatter", "rapid": "Seltzer Squirter", "launcher": "Kaboom Bomber"},
 	"hud": {"radius": 16, "border": 5, "shadow": 7, "tilt": 3.0, "uppercase": true, "font_scale": 1.05},
 	"feel": {"hitstop": 0.06, "shake": 1.25},
 	"desk": {"object": "comic", "cover": "@prop", "pages": "@floor", "art": "@player", "accent": "@ui_accent"}
