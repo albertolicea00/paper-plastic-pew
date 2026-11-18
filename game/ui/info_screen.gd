@@ -195,32 +195,44 @@ func _draw_gamepad(c: Control, r: Rect2) -> void:
 
 func _controller(c: Control, mid: Vector2, w: float, platform: String) -> void:
 	var ink = pack.color("ink")
+	var shell = pack.color("ui_bg").lightened(0.12)
 	_caption(c, mid + Vector2(0, -116), "XBOX" if platform == "xbox" else "PLAYSTATION", pack.color("ui_fg"))
+	# Two grips first, so the body overlaps their tops into one silhouette.
+	for s in [-1, 1]:
+		var grip = mid + Vector2(s * w * 0.34, 52)
+		c.draw_circle(grip, 40, shell)
+		c.draw_arc(grip, 40, 0, TAU, 28, ink, 4.0, true)
 	var body = StyleBoxFlat.new()
-	body.bg_color = pack.color("ui_bg").lightened(0.12)
+	body.bg_color = shell
 	body.border_color = ink
 	body.set_border_width_all(4)
-	body.set_corner_radius_all(64)
-	body.draw(c.get_canvas_item(), Rect2(mid - Vector2(w * 0.5, 62), Vector2(w, 150)))
-	# Shoulders, labelled per platform.
+	body.set_corner_radius_all(52)
+	body.draw(c.get_canvas_item(), Rect2(mid - Vector2(w * 0.5, 56), Vector2(w, 112)))
+	# Bumpers on the top edge.
 	for s in [-1, 1]:
 		var tag = ("LB" if s < 0 else "RB") if platform == "xbox" else ("L1" if s < 0 else "R1")
-		_cap(c, mid + Vector2(s * w * 0.42 - 28, -96), Vector2(56, 26), tag)
-	_stick(c, mid + Vector2(-w * 0.3, -6), 30, "")
-	_stick(c, mid + Vector2(w * 0.1, 44), 26, "")
-	_dpad(c, mid + Vector2(-w * 0.06, 44), 14)
-	# Face buttons: Xbox letters, PlayStation shapes. Top=swap, bottom=dash.
-	var face = mid + Vector2(w * 0.32, 6)
+		_cap(c, mid + Vector2(s * w * 0.3 - 28, -84), Vector2(56, 24), tag)
+	# Layout differs: Xbox offsets the left stick up; PlayStation puts both low.
+	var face = mid + Vector2(w * 0.3, -14)
 	if platform == "xbox":
-		_face(c, face + Vector2(0, 30), "A", pack.color("runner"))
-		_face(c, face + Vector2(30, 0), "B", pack.color("boss"))
-		_face(c, face + Vector2(-30, 0), "X", pack.color("player"))
-		_face(c, face + Vector2(0, -30), "Y", pack.color("prop"))
+		_stick(c, mid + Vector2(-w * 0.3, -14), 26, "")
+		_dpad(c, mid + Vector2(-w * 0.16, 30), 13)
+		_stick(c, mid + Vector2(w * 0.08, 30), 24, "")
 	else:
-		_ps_button(c, face + Vector2(0, 30), "cross", Color("#4a7fd0"))
-		_ps_button(c, face + Vector2(30, 0), "circle", Color("#d84a52"))
-		_ps_button(c, face + Vector2(-30, 0), "square", Color("#d858a8"))
-		_ps_button(c, face + Vector2(0, -30), "triangle", Color("#3fb58a"))
+		_dpad(c, mid + Vector2(-w * 0.3, -14), 13)
+		_stick(c, mid + Vector2(-w * 0.12, 32), 24, "")
+		_stick(c, mid + Vector2(w * 0.12, 32), 24, "")
+	# Face buttons: Xbox letters, PlayStation shapes. Top=swap, bottom=dash.
+	if platform == "xbox":
+		_face(c, face + Vector2(0, 26), "A", Color("#6ab04c"))
+		_face(c, face + Vector2(26, 0), "B", Color("#d84a52"))
+		_face(c, face + Vector2(-26, 0), "X", Color("#4a7fd0"))
+		_face(c, face + Vector2(0, -26), "Y", Color("#e6b800"))
+	else:
+		_ps_button(c, face + Vector2(0, 26), "cross", Color("#8aa0d8"))
+		_ps_button(c, face + Vector2(26, 0), "circle", Color("#d84a52"))
+		_ps_button(c, face + Vector2(-26, 0), "square", Color("#d858a8"))
+		_ps_button(c, face + Vector2(0, -26), "triangle", Color("#3fb58a"))
 
 func _ps_button(c: Control, at: Vector2, glyph: String, tone: Color) -> void:
 	var ink = pack.color("ink")
