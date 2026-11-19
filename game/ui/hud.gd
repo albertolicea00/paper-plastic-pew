@@ -16,7 +16,6 @@ var sheet: VBoxContainer
 var sheet_title: Label
 var sheet_body: Label
 var resume: Button
-var view_button: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -35,7 +34,6 @@ func _ready() -> void:
 	sheet_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sheet.add_child(sheet_body)
 	resume = _button("Resume", func(): game.set_paused(false))
-	view_button = _button("", _cycle_view)
 	_button("Settings", _open_settings)
 	_button("Controls", func(): _info("controls"))
 	_button("Credits", func(): _info("credits"))
@@ -60,12 +58,6 @@ func _button(text: String, action: Callable) -> Button:
 	sheet.add_child(button)
 	return button
 
-func _cycle_view() -> void:
-	var views = GameMatch.VIEWS
-	game.set_view(views[(views.find(game.view) + 1) % views.size()])
-	game.main.set_setting("view", game.view)
-	view_button.text = "View: " + GameMatch.VIEW_NAMES[game.view]
-
 func announce(text: String, sub: String = "", seconds: float = 1.6) -> void:
 	banner = text
 	banner_sub = sub
@@ -82,8 +74,6 @@ func show_sheet(title: String, body: String) -> void:
 	sheet_body.text = body
 	sheet_body.visible = body != ""
 	resume.visible = not game.over
-	view_button.visible = not game.over
-	view_button.text = "View: " + GameMatch.VIEW_NAMES[game.view]
 	var font = _font()
 	sheet_title.add_theme_font_override("font", font)
 	sheet_title.add_theme_font_size_override("font_size", 64)

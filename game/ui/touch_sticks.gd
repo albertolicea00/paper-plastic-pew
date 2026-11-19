@@ -38,6 +38,7 @@ func layout() -> void:
 	buttons = {
 		"dash": [Vector2(right - 90, bottom - 290), 44.0, "DASH"],
 		"swap": [Vector2(right - 210, bottom - 330), 36.0, "SWAP"],
+		"view": [Vector2(inset[0] + 150, bottom - 310), 30.0, "VIEW"],
 		"pause": [Vector2(right - 46, inset[1] + 46), 28.0, "II"] }
 
 func rest(side: int) -> Vector2:
