@@ -94,6 +94,8 @@ func _ready() -> void:
 	add_child(layer)
 	touch = TouchSticks.new()
 	touch.visible = config.get("touch", false)
+	touch.auto_fire = main.settings.get("auto_fire", false)
+	touch.save_auto = func(value): main.set_setting("auto_fire", value)
 	layer.add_child(touch)
 	hud = Hud.new()
 	hud.game = self

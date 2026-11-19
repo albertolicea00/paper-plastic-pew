@@ -21,7 +21,7 @@ var options: Dictionary = {}
 var best: Dictionary = {}
 # Player options, kept between runs and applied by _apply_settings().
 # view: top | shoulder | weapon; quality: low | high; volumes 0..1.
-var settings: Dictionary = {"view": "top", "music": 0.6, "sfx": 0.8, "touch": false, "fullscreen": false, "fps": false, "quality": "high"}
+var settings: Dictionary = {"view": "top", "music": 0.6, "sfx": 0.8, "touch": false, "fullscreen": false, "fps": false, "quality": "high", "auto_fire": false}
 
 func _ready() -> void:
 	for argument in OS.get_cmdline_user_args():
@@ -41,6 +41,8 @@ func _ready() -> void:
 			best[mode] = save.get_value("best", mode, 0)
 		for key in settings.keys():
 			settings[key] = save.get_value("settings", key, settings[key])
+	if options.has("autofire"):
+		settings["auto_fire"] = true
 	_apply_settings()
 	if options.has("smoke"):
 		add_child(Smoke.new())
