@@ -144,5 +144,6 @@
 		"cover": "@weapon",
 		"art": "@player",
 		"accent": "@player_accent"
-	}
+	},
+	"icons": "icons.gd"
 }

@@ -26,6 +26,7 @@ var tagline = ""
 var order = 0
 var animator: DimensionAnimator
 var builder: DimensionBuilder
+var icons: DimensionIcons
 var arenas: Dictionary = {}
 var overlay: ShaderMaterial
 var font: Font
@@ -61,6 +62,8 @@ static func load_from(pack_dir: String) -> DimensionPack:
 	pack.animator = script.new() if script is GDScript else DimensionAnimator.new()
 	var shapes = pack._resource(parsed.get("builder", ""))
 	pack.builder = shapes.new() if shapes is GDScript else DimensionBuilder.new()
+	var glyphs = pack._resource(parsed.get("icons", ""))
+	pack.icons = glyphs.new() if glyphs is GDScript else DimensionIcons.new()
 	# Optional arenas of its own, same format as core/data/arenas.json.
 	if FileAccess.file_exists(pack.path("arenas.json")):
 		var layouts = JSON.parse_string(FileAccess.get_file_as_string(pack.path("arenas.json")))

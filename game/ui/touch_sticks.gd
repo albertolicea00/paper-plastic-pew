@@ -174,31 +174,9 @@ func _draw() -> void:
 		_icon(action, button[0], button[1] * 0.55, line)
 	_draw_fire(font, pack, line, fill, accent)
 
-# Line-art icons per action, drawn in the world's own colour. A size, not text,
-# so the controls read the same in every language and match each dimension.
+# The active dimension draws its own symbol for each action.
 func _icon(name: String, at: Vector2, r: float, col: Color) -> void:
-	match name:
-		"fire":
-			draw_arc(at, r * 0.75, 0, TAU, 20, col, 3.0, true)
-			for d in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
-				draw_line(at + d * r * 0.45, at + d * r * 1.05, col, 3.0, true)
-			draw_circle(at, r * 0.14, col)
-		"dash":
-			for ox in [-0.28, 0.34]:
-				var b = at + Vector2(ox * r, 0)
-				draw_polyline(PackedVector2Array([b + Vector2(-r * 0.3, -r * 0.55), b + Vector2(r * 0.32, 0), b + Vector2(-r * 0.3, r * 0.55)]), col, 3.0, true)
-		"view":
-			draw_arc(at, r * 0.95, deg_to_rad(205), deg_to_rad(335), 14, col, 3.0, true)
-			draw_arc(at, r * 0.95, deg_to_rad(25), deg_to_rad(155), 14, col, 3.0, true)
-			draw_circle(at, r * 0.32, col)
-		"swap":
-			draw_arc(at, r * 0.62, deg_to_rad(300), deg_to_rad(560), 22, col, 3.0, true)
-			var tip = at + Vector2(cos(deg_to_rad(300)), sin(deg_to_rad(300))) * r * 0.62
-			draw_line(tip, tip + Vector2(-r * 0.3, -r * 0.05), col, 3.0, true)
-			draw_line(tip, tip + Vector2(0.0, -r * 0.32), col, 3.0, true)
-		"pause":
-			for sx in [-1.0, 1.0]:
-				draw_rect(Rect2(at + Vector2(sx * r * 0.32 - r * 0.11, -r * 0.5), Vector2(r * 0.22, r)), col)
+	Dimensions.hub.active.icons.draw(self, name, at, r, col)
 
 # FIRE button: filled when firing or locked, with a lock badge in auto mode and
 # a lock hint sliding up while the player drags toward the lock.
