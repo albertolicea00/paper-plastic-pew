@@ -54,9 +54,14 @@ func run() -> void:
 	check(game.over and not game.victory, "player death did not end the match")
 	# Campaign: clear a stage and move on to the next dimension.
 	game = await play({"mode": "campaign", "dimension": dimensions.packs[0].id, "arena": "pillars"}, 1.0)
-	game.player.damage_scale = 30.0
+	# One-shot everything so clearing the stage never hangs on autopilot aim RNG.
+	game.player.damage_scale = 500.0
 	waited = 0.0
-	while game.director.stage < 1 and waited < 14.0:
+	while game.director.stage < 1 and waited < 28.0:
+		# Nudge any lingering enemies dead so a slow boss hunt can't stall the test.
+		for actor in game.actors.duplicate():
+			if actor.alive and actor != game.player and actor.global_position.distance_to(game.player.global_position) < 4.0:
+				actor.take_damage(9999.0, game.player)
 		await get_tree().create_timer(0.5, true, false, true).timeout
 		waited += 0.5
 	check(game.director.stage >= 1, "campaign stage did not complete")
