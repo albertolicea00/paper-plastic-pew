@@ -47,10 +47,10 @@ func layout() -> void:
 	var right = size.x - inset[2]
 	var top = inset[1]
 	var bottom = size.y - inset[3]
-	# FIRE is the big right-thumb button; DASH sits above it.
-	fire_button = [Vector2(right - 125, bottom - 175), 54.0, "FIRE"]
+	# FIRE takes the spot SWAP used to hold; DASH stays in the lower cluster.
+	fire_button = [Vector2(right - 210, bottom - 330), 36.0, "FIRE"]
 	buttons = {
-		"dash": [Vector2(right - 115, bottom - 300), 42.0, "DASH"],
+		"dash": [Vector2(right - 90, bottom - 290), 44.0, "DASH"],
 		"view": [Vector2(left + 150, bottom - 310), 30.0, "VIEW"],
 		# SWAP sits up by the pause button for now; it is slated to be deprecated.
 		"swap": [Vector2(right - 112, top + 46), 28.0, "SWAP"],
@@ -171,8 +171,34 @@ func _draw() -> void:
 		var button: Array = buttons[action]
 		draw_circle(button[0], button[1], Color(accent, 0.5) if held.values().has(action) else fill)
 		draw_arc(button[0], button[1], 0, TAU, 32, line, 3.0, true)
-		_label(font, button[0], button[2], int(button[1] * 0.45), line)
+		_icon(action, button[0], button[1] * 0.55, line)
 	_draw_fire(font, pack, line, fill, accent)
+
+# Line-art icons per action, drawn in the world's own colour. A size, not text,
+# so the controls read the same in every language and match each dimension.
+func _icon(name: String, at: Vector2, r: float, col: Color) -> void:
+	match name:
+		"fire":
+			draw_arc(at, r * 0.75, 0, TAU, 20, col, 3.0, true)
+			for d in [Vector2(1, 0), Vector2(-1, 0), Vector2(0, 1), Vector2(0, -1)]:
+				draw_line(at + d * r * 0.45, at + d * r * 1.05, col, 3.0, true)
+			draw_circle(at, r * 0.14, col)
+		"dash":
+			for ox in [-0.28, 0.34]:
+				var b = at + Vector2(ox * r, 0)
+				draw_polyline(PackedVector2Array([b + Vector2(-r * 0.3, -r * 0.55), b + Vector2(r * 0.32, 0), b + Vector2(-r * 0.3, r * 0.55)]), col, 3.0, true)
+		"view":
+			draw_arc(at, r * 0.95, deg_to_rad(205), deg_to_rad(335), 14, col, 3.0, true)
+			draw_arc(at, r * 0.95, deg_to_rad(25), deg_to_rad(155), 14, col, 3.0, true)
+			draw_circle(at, r * 0.32, col)
+		"swap":
+			draw_arc(at, r * 0.62, deg_to_rad(300), deg_to_rad(560), 22, col, 3.0, true)
+			var tip = at + Vector2(cos(deg_to_rad(300)), sin(deg_to_rad(300))) * r * 0.62
+			draw_line(tip, tip + Vector2(-r * 0.3, -r * 0.05), col, 3.0, true)
+			draw_line(tip, tip + Vector2(0.0, -r * 0.32), col, 3.0, true)
+		"pause":
+			for sx in [-1.0, 1.0]:
+				draw_rect(Rect2(at + Vector2(sx * r * 0.32 - r * 0.11, -r * 0.5), Vector2(r * 0.22, r)), col)
 
 # FIRE button: filled when firing or locked, with a lock badge in auto mode and
 # a lock hint sliding up while the player drags toward the lock.
@@ -185,7 +211,7 @@ func _draw_fire(font: Font, pack: DimensionPack, line: Color, fill: Color, accen
 	if auto_fire:
 		_padlock(at, r * 0.5, Color(pack.color("ui_fg"), 0.95), true)
 	else:
-		_label(font, at, "FIRE", int(r * 0.42), line)
+		_icon("fire", at, r * 0.55, line)
 		# While dragging up, a lock hint fills in above the button.
 		if fire_drag > 0.05:
 			var hint = at + Vector2(0, -r - 34.0)
