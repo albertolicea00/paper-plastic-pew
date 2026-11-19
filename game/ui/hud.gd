@@ -16,6 +16,7 @@ var sheet: VBoxContainer
 var sheet_title: Label
 var sheet_body: Label
 var resume: Button
+var restart: Button
 
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -33,12 +34,14 @@ func _ready() -> void:
 	sheet_body = Label.new()
 	sheet_body.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	sheet.add_child(sheet_body)
+	# On Game Over this reads Restart, Main menu, Controls, Settings, Credits;
+	# pausing just adds Resume on top. Restart leads and blinks (see _process).
 	resume = _button("Resume", func(): game.set_paused(false))
-	_button("Settings", _open_settings)
-	_button("Controls", func(): _info("controls"))
-	_button("Credits", func(): _info("credits"))
-	_button("Restart", func(): game.main.start(game.config))
+	restart = _button("Restart", func(): game.main.start(game.config))
 	_button("Main menu", func(): game.main.show_menu())
+	_button("Controls", func(): _info("controls"))
+	_button("Settings", _open_settings)
+	_button("Credits", func(): _info("credits"))
 
 func _info(which: String) -> void:
 	var screen = InfoScreen.new()
@@ -136,6 +139,9 @@ func _bearing(dir: Vector3) -> float:
 
 func _process(delta: float) -> void:
 	banner_left = maxf(0.0, banner_left - delta / maxf(Engine.time_scale, 0.01))
+	# Blink Restart on the Game Over sheet so the player sees the main action.
+	if restart != null:
+		restart.modulate.a = (0.5 + 0.5 * absf(sin(Time.get_ticks_msec() * 0.006))) if (sheet.visible and game.over) else 1.0
 	hurt_left = maxf(0.0, hurt_left - delta)
 	queue_redraw()
 
