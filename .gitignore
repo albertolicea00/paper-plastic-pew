@@ -26,6 +26,13 @@ builds/**
 *.mobileprovision
 .env
 .env.*
+secrets.properties
+*.secret
+keys/google-services.json
+keys/release.properties
+keystore.properties
+signing.properties
+*.p8
 
 # Android / Gradle (if custom builds are enabled)
 **/android/build/
