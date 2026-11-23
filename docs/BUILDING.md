@@ -77,7 +77,15 @@ Release desktop builds use the same naming as the APKs:
 | `make dmg` | `builds/macos/paper-plastic-pew-v<version>-<code>-release.dmg` (universal `.app`, ad-hoc signed) |
 | `make exe` | `builds/windows/paper-plastic-pew-v<version>-<code>-release.exe` (x86_64, embedded `.pck`) |
 
-The macOS preset's `application/short_version` and `application/version` must be `<version>` and `<code>`, and the Windows preset's `application/file_version` and `application/product_version` `<version>.<code>` (Windows versions have four numbers); `make dmg` and `make exe` stop when they differ from the Android preset. There is no Developer ID or notarization, so another Mac opens the `.dmg` app the first time with right-click → Open. Linux packages are not produced yet.
+The macOS preset's `application/short_version` and `application/version` must be `<version>` and `<code>`, and the Windows preset's `application/file_version` and `application/product_version` `<version>.<code>` (Windows versions have four numbers); `make dmg` and `make exe` stop when they differ from the Android preset. Linux packages are not produced yet.
+
+**First launch on another Mac (Gatekeeper).** The app is ad-hoc signed but not notarized, so macOS blocks a copy that was downloaded (web, AirDrop, chat apps) with "cannot verify the developer". To open it:
+
+- **macOS 15 Sequoia or later:** try to open it once, then System Settings → Privacy & Security → **Open Anyway**. Right-click → Open no longer bypasses the check.
+- **macOS 14 or earlier:** right-click the app → **Open**, then confirm.
+- **Any version, from Terminal:** `xattr -dr com.apple.quarantine "/Applications/Paper, Plastic, Pew!.app"`
+
+The Mac that built it opens it directly. Only a Developer ID certificate plus Apple notarization (paid Apple Developer Program) removes the warning. The disk image has no Applications shortcut: drag the app to Applications, or run it from the image.
 
 ## Other platforms
 

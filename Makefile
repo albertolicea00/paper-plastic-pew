@@ -113,7 +113,7 @@ MACOS_VERSION := $(call ANDROID_PRESET_FIELD,application/short_version,macOS) ($
 WINDOWS_VERSION := $(call ANDROID_PRESET_FIELD,application/file_version,Windows Desktop)/$(call ANDROID_PRESET_FIELD,application/product_version,Windows Desktop)
 
 # Release desktop builds named like the APKs. The .dmg is ad-hoc signed by Godot (no Developer ID),
-# so another Mac opens it the first time with right-click → Open. The .exe embeds the .pck.
+# not notarized; see the docs for opening it on another Mac (Gatekeeper). The .exe embeds the .pck.
 dmg: import
 	@test "$(MACOS_VERSION)" = "$(VERSION) ($(VERSION_CODE))" || { printf '%s\n' 'The macOS preset is $(MACOS_VERSION), the Android preset $(VERSION) ($(VERSION_CODE)). Make them match.' >&2; exit 1; }
 	mkdir -p "$(dir $(MACOS_DMG))"
