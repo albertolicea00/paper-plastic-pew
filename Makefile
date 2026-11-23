@@ -19,6 +19,7 @@ $(error Could not read version/name and version/code from the Android preset in 
 endif
 ANDROID_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-debug.apk
 ANDROID_RELEASE_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-release.apk
+ANDROID_RELEASE_UNSIGNED := $(ANDROID_RELEASE_APK:.apk=-unsigned.apk)
 IOS_ZIP := builds/ios/paper-plastic-pew.zip
 MACOS_ZIP := builds/macos/paper-plastic-pew.zip
 DIMENSION ?= anime
@@ -38,7 +39,7 @@ help:
 	  'make capture          Save builds/captures/$$DIMENSION.png (DIMENSION=anime MODE=survival)' \
 	  'make captures         Capture every dimension' \
 	  'make android          Export builds/android/paper-plastic-pew-v<version>-<code>-debug.apk' \
-	  'make android-release  Export the matching -release.apk (needs a release keystore)' \
+	  'make android-release  Export the matching -release.apk signed with keys/release.properties' \
 	  'make install-android  Install the debug APK of the current version via ADB' \
 	  'make version          Print the Android version name and code' \
 	  'make ios              Export the iOS project once signing is configured' \
@@ -72,9 +73,13 @@ android: import
 	mkdir -p "$(dir $(ANDROID_APK))"
 	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-debug Android "$(CURDIR)/$(ANDROID_APK)"
 
+# Godot cannot sign with passwords that contain shell characters, so it exports the unsigned
+# "Android Release (arm64)" preset and tools/sign_apk.py signs it with keys/release.properties.
 android-release: import
 	mkdir -p "$(dir $(ANDROID_RELEASE_APK))"
-	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release Android "$(CURDIR)/$(ANDROID_RELEASE_APK)"
+	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release "Android Release (arm64)" "$(CURDIR)/$(ANDROID_RELEASE_UNSIGNED)"
+	"$(PYTHON)" tools/sign_apk.py "$(ANDROID_RELEASE_UNSIGNED)" "$(ANDROID_RELEASE_APK)" keys/release.properties
+	rm -f "$(ANDROID_RELEASE_UNSIGNED)"
 
 version:
 	@printf '%s (%s)\n' "$(VERSION)" "$(VERSION_CODE)"
