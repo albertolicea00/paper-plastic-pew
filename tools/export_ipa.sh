@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Exports the iOS preset as an Xcode project, then archives it in Release and writes
-# builds/ios/<app>-v<version>-<build>-release.ipa.
+# <out dir>/<app>-v<version>-<build>-release.ipa.
 #
-# usage: tools/export_ipa.sh <godot project dir> <app name>
+# usage: tools/export_ipa.sh <godot project dir> <app name> [out dir, default builds/ios]
 #
 # Version and build come from application/short_version and application/version in the iOS
 # preset. Signing uses DEVELOPMENT_TEAM from keys/ios.properties (git-ignored), or TEAM=<id>:
@@ -13,7 +13,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-project="$1"; app="$2"
+project="$1"; app="$2"; out="${3:-builds/ios}"
 preset="$project/export_presets.cfg"
 godot="${GODOT_BIN:-godot}"
 fail() { printf 'export_ipa: %s\n' "$1" >&2; exit 1; }
@@ -45,25 +45,27 @@ cp "$preset" "$work/export_presets.cfg.orig"
 restore() { cp "$work/export_presets.cfg.orig" "$preset"; rm -rf "$work"; }
 trap restore EXIT
 
-# The team id goes into the iOS preset for this export only.
+# For this export only: the team id, and project-only output so Godot does not sign with its own
+# (distribution) settings; xcodebuild signs below.
 awk -v team="$team" '
     /^\[preset\.[0-9]+\]$/ { section = $0 }
     /^name="iOS"$/ { target = section; sub(/\]$/, ".options]", target) }
     /^\[/ { current = $0 }
     current == target && index($0, "application/app_store_team_id=") == 1 { $0 = "application/app_store_team_id=\"" team "\"" }
+    current == target && index($0, "application/export_project_only=") == 1 { next }
     { print }
+    $0 == target { print "application/export_project_only=true" }
 ' "$work/export_presets.cfg.orig" > "$preset"
 
 echo "Exporting the iOS Xcode project ($version, build $build)"
-"$godot" --headless --path "$project" --export-release iOS "$work/xcode.zip"
 mkdir -p "$work/xcode"
-unzip -q "$work/xcode.zip" -d "$work/xcode"
+"$godot" --headless --path "$project" --export-release iOS "$work/xcode/$app.ipa"
 xcodeproj=$(find "$work/xcode" -maxdepth 3 -name "*.xcodeproj" | head -1)
 [ -n "$xcodeproj" ] || fail "the Godot export has no .xcodeproj."
 scheme=$(basename "$xcodeproj" .xcodeproj)
 
-log="builds/ios/xcodebuild.log"
-mkdir -p builds/ios
+log="$out/xcodebuild.log"
+mkdir -p "$out"
 echo "Archiving in Release (team $team); log: $log"
 xcodebuild -project "$xcodeproj" -scheme "$scheme" -configuration Release \
     -destination "generic/platform=iOS" -archivePath "$work/app.xcarchive" \
@@ -87,7 +89,7 @@ echo "Exporting the IPA ($method)"
 xcodebuild -exportArchive -archivePath "$work/app.xcarchive" -exportPath "$work/export" \
     -exportOptionsPlist "$work/ExportOptions.plist" -allowProvisioningUpdates >>"$log" 2>&1 \
     || { grep -E "error" "$log" | sort -u | tail -10 >&2; fail "the export failed; full log: $log"; }
-ipa="builds/ios/$app-v$version-$build-release.ipa"
+ipa="$out/$app-v$version-$build-release.ipa"
 mv "$work/export/"*.ipa "$ipa"
 echo "signed $ipa"
 [ "$free" = 1 ] && echo "Personal (free) team: the IPA installs only on your registered devices and stops opening after 7 days."

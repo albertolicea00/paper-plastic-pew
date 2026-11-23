@@ -46,6 +46,7 @@ help:
 	  'make android-release  Export the matching -release.apk signed with keys/release.properties' \
 	  'make install-android  Install the debug APK of the current version via ADB' \
 	  'make version          Print the Android version name and code' \
+	  'make ipa              Export the signed iOS IPA (team from keys/ios.properties)' \
 	  'make ios              Export the iOS project once signing is configured' \
 	  'make macos | windows | linux   Export a desktop build' \
 	  'make clean            Remove the Godot import cache and exported packages'

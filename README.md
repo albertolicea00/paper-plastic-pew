@@ -24,6 +24,7 @@ A gamepad works as a twin stick: left stick moves, right stick aims and fires.
 make android          # builds/android/paper-plastic-pew-v<version>-<versionCode>-debug.apk
 make android-release  # same name ending in -release.apk; signed with keys/release.properties
 make install-android  # install the debug APK on a connected device
+make ipa              # builds/ios/paper-plastic-pew-v<version>-<build>-release.ipa (team from keys/ios.properties)
 make ios | macos | windows | linux
 ```
 

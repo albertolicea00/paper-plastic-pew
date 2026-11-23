@@ -7,7 +7,7 @@ Every export goes through the Makefile, which runs Godot headless against `game/
 - Godot 4.6.3 on the `PATH` as `godot`, or pass `GODOT_BIN=/path/to/godot`.
 - Godot export templates for 4.6.3 (Editor > Manage Export Templates).
 - Android: a JDK and the Android SDK, set in the Godot editor under Editor Settings > Export > Android. `adb` on the `PATH` (or `ADB=...`) for `make install-android`.
-- iOS: macOS with Xcode, and a team and provisioning profile set in the iOS preset. Not configured yet.
+- iOS: macOS with Xcode signed in to your Apple ID, and `DEVELOPMENT_TEAM` in `keys/ios.properties` (see [iOS](#ios)).
 
 Every export target runs `make import` first, so a fresh checkout needs no extra step.
 
@@ -56,6 +56,17 @@ keyPassword=...
 Godot is not left to sign the release itself because it passes the keystore password through a shell: a password containing shell characters (such as `$`, `!`, `|`, `\`, `"`, `` ` ``, `&`, `<`, `>`) makes its export fail with "Release Username and/or Password is invalid" or a shell syntax error. The script needs Python 3 and the Android SDK build-tools (found through `ANDROID_HOME`, `ANDROID_SDK_ROOT` or `~/Library/Android/sdk`).
 
 Never commit a keystore, its passwords, or `export_credentials.cfg`.
+
+## iOS
+
+`make ipa` writes `builds/ios/paper-plastic-pew-v<version>-<build>-release.ipa`, signed through Xcode:
+
+1. Godot exports the iOS preset as an Xcode project (release template).
+2. `xcodebuild` archives it in Release and exports the IPA with automatic signing.
+
+- **Team:** `DEVELOPMENT_TEAM` in `keys/ios.properties` (git-ignored; copy `keys/ios.properties.example`), or `TEAM=<id>`. `tools/export_ipa.sh` writes it into the iOS preset only for the export, together with `application/export_project_only=true`, and always restores `game/export_presets.cfg` afterwards, so the team id never reaches git.
+- **Version:** `application/short_version` and `application/version` in the `iOS` preset; keep them equal to the Android preset's `version/name` and `version/code`.
+- **Export method:** `IPA_METHOD=debugging` (default with a free personal team), `release-testing` (Ad Hoc) or `app-store-connect` (default with a paid team). A free personal team only allows `debugging`: the IPA installs on your own registered devices and stops opening after 7 days. Ad Hoc, TestFlight and the App Store need the paid Apple Developer Program.
 
 ## Other platforms
 
