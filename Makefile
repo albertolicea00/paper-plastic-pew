@@ -30,7 +30,7 @@ DIMENSION ?= anime
 MODE ?= survival
 VIEW ?= top
 
-.PHONY: help import run touch shift check capture captures android android-release \
+.PHONY: ipa help import run touch shift check capture captures android android-release \
 	install-android version ios macos windows linux clean
 
 help:
@@ -92,6 +92,11 @@ version:
 install-android:
 	@test -f "$(ANDROID_APK)" || { printf '%s\n' '$(ANDROID_APK) missing. Run make android first.' >&2; exit 1; }
 	"$(ADB)" install -r "$(ANDROID_APK)"
+
+# Signed IPA from the iOS preset: builds/ios/paper-plastic-pew-v<version>-<build>-release.ipa.
+# Team from keys/ios.properties; IPA_METHOD=debugging|release-testing|app-store-connect.
+ipa: import
+	GODOT_BIN="$(GODOT_BIN)" tools/export_ipa.sh "$(PROJECT)" paper-plastic-pew
 
 ios: import
 	mkdir -p "$(dir $(IOS_ZIP))"
