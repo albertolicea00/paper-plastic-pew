@@ -26,11 +26,13 @@ ANDROID_RELEASE_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CO
 ANDROID_RELEASE_UNSIGNED := $(ANDROID_RELEASE_APK:.apk=-unsigned.apk)
 IOS_ZIP := builds/ios/paper-plastic-pew.zip
 MACOS_ZIP := builds/macos/paper-plastic-pew.zip
+MACOS_DMG := builds/macos/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-release.dmg
+WINDOWS_EXE := builds/windows/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-release.exe
 DIMENSION ?= anime
 MODE ?= survival
 VIEW ?= top
 
-.PHONY: ipa help import run touch shift check capture captures android android-release \
+.PHONY: ipa dmg exe help import run touch shift check capture captures android android-release \
 	install-android version ios macos windows linux clean
 
 help:
@@ -48,6 +50,8 @@ help:
 	  'make version          Print the Android version name and code' \
 	  'make ipa              Export the signed iOS IPA (team from keys/ios.properties)' \
 	  'make ios              Export the iOS project once signing is configured' \
+	  'make dmg              Export builds/macos/paper-plastic-pew-v<version>-<code>-release.dmg' \
+	  'make exe              Export builds/windows/paper-plastic-pew-v<version>-<code>-release.exe' \
 	  'make macos | windows | linux   Export a desktop build' \
 	  'make clean            Remove the Godot import cache and exported packages'
 
@@ -102,6 +106,23 @@ ipa: import
 ios: import
 	mkdir -p "$(dir $(IOS_ZIP))"
 	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-debug iOS "$(CURDIR)/$(IOS_ZIP)"
+
+# The macOS and Windows presets keep their own copies of the version: macOS short_version and
+# version (build) must be <version> and <code>, Windows file/product_version <version>.<code>.
+MACOS_VERSION := $(call ANDROID_PRESET_FIELD,application/short_version,macOS) ($(call ANDROID_PRESET_FIELD,application/version,macOS))
+WINDOWS_VERSION := $(call ANDROID_PRESET_FIELD,application/file_version,Windows Desktop)/$(call ANDROID_PRESET_FIELD,application/product_version,Windows Desktop)
+
+# Release desktop builds named like the APKs. The .dmg is ad-hoc signed by Godot (no Developer ID),
+# so another Mac opens it the first time with right-click → Open. The .exe embeds the .pck.
+dmg: import
+	@test "$(MACOS_VERSION)" = "$(VERSION) ($(VERSION_CODE))" || { printf '%s\n' 'The macOS preset is $(MACOS_VERSION), the Android preset $(VERSION) ($(VERSION_CODE)). Make them match.' >&2; exit 1; }
+	mkdir -p "$(dir $(MACOS_DMG))"
+	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release macOS "$(CURDIR)/$(MACOS_DMG)"
+
+exe: import
+	@test "$(WINDOWS_VERSION)" = "$(VERSION).$(VERSION_CODE)/$(VERSION).$(VERSION_CODE)" || { printf '%s\n' 'The Windows preset file/product_version is $(WINDOWS_VERSION); expected $(VERSION).$(VERSION_CODE) for both.' >&2; exit 1; }
+	mkdir -p "$(dir $(WINDOWS_EXE))"
+	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release "Windows Desktop" "$(CURDIR)/$(WINDOWS_EXE)"
 
 macos: import
 	mkdir -p "$(dir $(MACOS_ZIP))"
