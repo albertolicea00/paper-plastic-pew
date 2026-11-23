@@ -16,7 +16,7 @@ Every export target runs `make import` first, so a fresh checkout needs no extra
 ```sh
 make version          # print the version name and code the APK will carry, e.g. 0.1.0 (1)
 make android          # debug APK
-make android-release  # release APK, needs a release keystore (see below)
+make android-release  # release APK signed with keys/release.properties (see below)
 make install-android  # install the debug APK of the current version on the connected device
 ```
 
@@ -26,34 +26,34 @@ Both APKs land in `builds/android/` and are named
 paper-plastic-pew-v<version>-<versionCode>-<debug|release>.apk
 ```
 
-for example `paper-plastic-pew-v0.1.0-1-debug.apk`. Both use the `Android` export preset; only the debug or release flag differs.
+for example `paper-plastic-pew-v0.1.0-1-debug.apk`. The debug APK uses the `Android` preset (arm64 and x86_64, so it also runs on emulators); the release APK uses the `Android Release (arm64)` preset (arm64 only, exported unsigned and signed afterwards, see [Signing](#signing)).
+
+Run one Godot export at a time, also across projects: parallel exports share Godot's temporary APK in its global cache and fail with "Could not unzip temporary unaligned APK" or produce a broken APK.
 
 ### Version name and code
 
 The single source of truth is the `Android` preset in `game/export_presets.cfg`: `version/name` (shown to users) and `version/code` (the integer Android uses to order updates). The Makefile reads both from that preset's options section with `awk`, and stops with an error if it cannot find them. To release a new version, change those two fields (in the editor's export dialog or the file) and raise the code every time a build ships.
 
-The `Android Release (arm64)` and `Android Debug (arm64)` presets carry their own copies of both fields. The Makefile does not use those presets; if you export them from the editor, keep their version fields in sync by hand.
+The `Android Release (arm64)` and `Android Debug (arm64)` presets carry their own copies of both fields; keep them in sync. `make android-release` stops if the release preset's version differs from the `Android` preset's, since the file name and the manifest would disagree.
 
 ### Signing
 
 **Debug.** The preset's debug keystore fields are empty, so Godot signs with the editor's own debug keystore (Editor Settings > Export > Android > Debug Keystore), which it creates automatically. Nothing to set up.
 
-**Release.** Release signing is not wired into this repository. The Makefile passes no keystore, the release keystore fields are not stored in `export_presets.cfg`, and nothing reads `keys/release.properties` (it is only listed in `.gitignore`). `make android-release` succeeds only if Godot finds a release keystore through one of its own mechanisms:
+**Release.** `make android-release` exports the unsigned `Android Release (arm64)` preset and then runs `tools/sign_apk.py`, which aligns it with `zipalign` (16 KB pages on build-tools 35+) and signs it with `apksigner` using `keys/release.properties` (git-ignored; copy `keys/release.properties.example`):
 
-1. Environment variables, read by Godot at export time and taking precedence over the preset:
+```properties
+storeFile=release.jks
+storePassword=...
+keyAlias=key0
+keyPassword=...
+```
 
-   ```sh
-   GODOT_ANDROID_KEYSTORE_RELEASE_PATH=/absolute/path/to/release.jks \
-   GODOT_ANDROID_KEYSTORE_RELEASE_USER=<key alias> \
-   GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD='<password>' \
-   make android-release
-   ```
+- `storeFile` is relative to `keys/`.
+- The file follows Java Properties rules: a literal backslash is written `\\`; other characters (`= : # ! $`, quotes) go as they are, without quotes.
+- The passwords reach `apksigner` through environment variables and are never printed.
 
-   The values are used verbatim; the only escaping is your shell's quoting (single quotes keep `$`, `\` and spaces literal). Use an absolute path.
-
-2. The editor's export dialog (Project > Export > Android > Keystore > Release, User, Password). Godot keeps those fields out of `export_presets.cfg` and writes them to `game/.godot/export_credentials.cfg`, which is git-ignored. `make clean` deletes `game/.godot/`, so it also deletes these saved credentials; prefer the environment variables.
-
-If a `keys/release.properties` loader is added later, document its format here. Should it be parsed as Java Properties, `\` is an escape character there, so a literal backslash in a path or password has to be written `\\`.
+Godot is not left to sign the release itself because it passes the keystore password through a shell: a password containing shell characters (such as `$`, `!`, `|`, `\`, `"`, `` ` ``, `&`, `<`, `>`) makes its export fail with "Release Username and/or Password is invalid" or a shell syntax error. The script needs Python 3 and the Android SDK build-tools (found through `ANDROID_HOME`, `ANDROID_SDK_ROOT` or `~/Library/Android/sdk`).
 
 Never commit a keystore, its passwords, or `export_credentials.cfg`.
 

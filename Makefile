@@ -6,9 +6,10 @@ ADB ?= adb
 
 PROJECT := game
 # Version name and code come from the "Android" preset in game/export_presets.cfg.
-ANDROID_PRESET_FIELD = $(shell awk -v field='$(1)' ' \
+# $(call ANDROID_PRESET_FIELD,<field>[,<preset name>]) reads one option of one preset.
+ANDROID_PRESET_FIELD = $(shell awk -v field='$(1)' -v preset='name="$(or $(2),Android)"' ' \
 	/^\[preset\.[0-9]+\]$$/ { section = $$0; gsub(/[][]/, "", section) } \
-	/^name="Android"$$/ { target = section ".options" } \
+	$$0 == preset { target = section ".options" } \
 	/^\[/ { current = $$0; gsub(/[][]/, "", current) } \
 	current == target && index($$0, field "=") == 1 { value = substr($$0, length(field) + 2); gsub(/"/, "", value); print value; exit } \
 	' "$(PROJECT)/export_presets.cfg")
@@ -17,6 +18,9 @@ VERSION_CODE := $(call ANDROID_PRESET_FIELD,version/code)
 ifeq ($(strip $(VERSION)$(VERSION_CODE)),)
 $(error Could not read version/name and version/code from the Android preset in $(PROJECT)/export_presets.cfg)
 endif
+# The release APK comes from its own preset, which keeps its own copy of both fields.
+RELEASE_PRESET := Android Release (arm64)
+RELEASE_VERSION := $(call ANDROID_PRESET_FIELD,version/name,$(RELEASE_PRESET)) ($(call ANDROID_PRESET_FIELD,version/code,$(RELEASE_PRESET)))
 ANDROID_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-debug.apk
 ANDROID_RELEASE_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-release.apk
 ANDROID_RELEASE_UNSIGNED := $(ANDROID_RELEASE_APK:.apk=-unsigned.apk)
@@ -77,7 +81,8 @@ android: import
 # "Android Release (arm64)" preset and tools/sign_apk.py signs it with keys/release.properties.
 android-release: import
 	mkdir -p "$(dir $(ANDROID_RELEASE_APK))"
-	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release "Android Release (arm64)" "$(CURDIR)/$(ANDROID_RELEASE_UNSIGNED)"
+	@test "$(RELEASE_VERSION)" = "$(VERSION) ($(VERSION_CODE))" || { printf '%s\n' 'The "$(RELEASE_PRESET)" preset is $(RELEASE_VERSION), the Android preset $(VERSION) ($(VERSION_CODE)). Make them match.' >&2; exit 1; }
+	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release "$(RELEASE_PRESET)" "$(CURDIR)/$(ANDROID_RELEASE_UNSIGNED)"
 	"$(PYTHON)" tools/sign_apk.py "$(ANDROID_RELEASE_UNSIGNED)" "$(ANDROID_RELEASE_APK)" keys/release.properties
 	rm -f "$(ANDROID_RELEASE_UNSIGNED)"
 
