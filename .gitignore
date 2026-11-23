@@ -23,21 +23,17 @@ builds/**
 *.keystore
 *.jks
 *.p12
+*.p8
 *.mobileprovision
 .env
 .env.*
 secrets.properties
+keystore.properties
+signing.properties
 *.secret
 keys/google-services.json
 keys/release.properties
 keys/ios.properties
-*.jks
-*.keystore
-keystore.properties
-signing.properties
-*.p12
-*.mobileprovision
-*.p8
 
 # Android / Gradle (if custom builds are enabled)
 **/android/build/
@@ -56,4 +52,4 @@ Thumbs.db
 .idea/
 *.swp
 *~
-.workspace/
+
