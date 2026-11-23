@@ -7,6 +7,7 @@
 - Dimensions change look, animation, sound and feel only. Collision, hitboxes, speeds and rules are shared so a shift can happen mid-fight.
 - `../doodleshooter-port` is a separate, archived project: read it for reference, never modify it, and do not copy its Doodle assets, maps or attribution.
 - Third-party material must be free to use (CC0 audio, OFL fonts) and listed in `CREDITS.txt` (mirrored to `game/CREDITS.txt` so it ships). Never invent authors or sources.
+- Builds and exports go through the Makefile; see `docs/BUILDING.md`. Android APKs are `builds/android/paper-plastic-pew-v<version>-<versionCode>-<debug|release>.apk`, with both numbers read from the `Android` preset in `game/export_presets.cfg`. Change the version only there, and only when asked.
 - Run `make check` after gameplay changes. Headless checks prove logic only; look at `make capture` output before claiming anything visual. Device play is unverified until someone plays on a device.
 - Commits: Conventional Commits, small and scoped, no co-author trailers.
 - Online multiplayer is deferred to a later phase. Do not invent signing credentials or store listings.

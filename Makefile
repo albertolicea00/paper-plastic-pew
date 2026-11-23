@@ -5,8 +5,20 @@ PYTHON ?= python3
 ADB ?= adb
 
 PROJECT := game
-ANDROID_APK := builds/android/paper-plastic-pew-debug.apk
-ANDROID_RELEASE_APK := builds/android/paper-plastic-pew-release.apk
+# Version name and code come from the "Android" preset in game/export_presets.cfg.
+ANDROID_PRESET_FIELD = $(shell awk -v field='$(1)' ' \
+	/^\[preset\.[0-9]+\]$$/ { section = $$0; gsub(/[][]/, "", section) } \
+	/^name="Android"$$/ { target = section ".options" } \
+	/^\[/ { current = $$0; gsub(/[][]/, "", current) } \
+	current == target && index($$0, field "=") == 1 { value = substr($$0, length(field) + 2); gsub(/"/, "", value); print value; exit } \
+	' "$(PROJECT)/export_presets.cfg")
+VERSION := $(call ANDROID_PRESET_FIELD,version/name)
+VERSION_CODE := $(call ANDROID_PRESET_FIELD,version/code)
+ifeq ($(strip $(VERSION)$(VERSION_CODE)),)
+$(error Could not read version/name and version/code from the Android preset in $(PROJECT)/export_presets.cfg)
+endif
+ANDROID_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-debug.apk
+ANDROID_RELEASE_APK := builds/android/paper-plastic-pew-v$(VERSION)-$(VERSION_CODE)-release.apk
 IOS_ZIP := builds/ios/paper-plastic-pew.zip
 MACOS_ZIP := builds/macos/paper-plastic-pew.zip
 DIMENSION ?= anime
@@ -14,7 +26,7 @@ MODE ?= survival
 VIEW ?= top
 
 .PHONY: help import run touch shift check capture captures android android-release \
-	install-android ios macos windows linux clean
+	install-android version ios macos windows linux clean
 
 help:
 	@printf '%s\n' \
@@ -25,9 +37,10 @@ help:
 	  'make check            Run the headless gameplay checks' \
 	  'make capture          Save builds/captures/$$DIMENSION.png (DIMENSION=anime MODE=survival)' \
 	  'make captures         Capture every dimension' \
-	  'make android          Export the Android debug APK' \
-	  'make android-release  Export a release APK (requires release signing)' \
-	  'make install-android  Install the debug APK via ADB' \
+	  'make android          Export builds/android/paper-plastic-pew-v<version>-<code>-debug.apk' \
+	  'make android-release  Export the matching -release.apk (needs a release keystore)' \
+	  'make install-android  Install the debug APK of the current version via ADB' \
+	  'make version          Print the Android version name and code' \
 	  'make ios              Export the iOS project once signing is configured' \
 	  'make macos | windows | linux   Export a desktop build' \
 	  'make clean            Remove the Godot import cache and exported packages'
@@ -63,8 +76,11 @@ android-release: import
 	mkdir -p "$(dir $(ANDROID_RELEASE_APK))"
 	"$(GODOT_BIN)" --headless --path "$(PROJECT)" --export-release Android "$(CURDIR)/$(ANDROID_RELEASE_APK)"
 
+version:
+	@printf '%s (%s)\n' "$(VERSION)" "$(VERSION_CODE)"
+
 install-android:
-	@test -f "$(ANDROID_APK)" || { printf '%s\n' 'Debug APK missing. Run make android first.' >&2; exit 1; }
+	@test -f "$(ANDROID_APK)" || { printf '%s\n' '$(ANDROID_APK) missing. Run make android first.' >&2; exit 1; }
 	"$(ADB)" install -r "$(ANDROID_APK)"
 
 ios: import

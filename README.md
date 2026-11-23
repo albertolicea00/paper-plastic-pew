@@ -18,7 +18,18 @@ make help     # every target, including exports and captures
 
 A gamepad works as a twin stick: left stick moves, right stick aims and fires.
 
-The Godot project lives in `game/`. `docs/ARCHITECTURE.md` explains the structure and `docs/DIMENSION_PACKS.md` how to add a dimension. Third-party audio and fonts are listed in `CREDITS.txt`.
+## Build
+
+```sh
+make android          # builds/android/paper-plastic-pew-v<version>-<versionCode>-debug.apk
+make android-release  # same name ending in -release.apk; needs a release keystore
+make install-android  # install the debug APK on a connected device
+make ios | macos | windows | linux
+```
+
+The version name and code come from the `Android` preset in `game/export_presets.cfg` (`make version` prints them). Prerequisites, signing and output paths are in `docs/BUILDING.md`.
+
+The Godot project lives in `game/`. `docs/ARCHITECTURE.md` explains the structure, `docs/BUILDING.md` how to export each platform, and `docs/DIMENSION_PACKS.md` how to add a dimension. Third-party audio and fonts are listed in `CREDITS.txt`.
 
 ## Why Paper, Plastic, Pew!?
 
