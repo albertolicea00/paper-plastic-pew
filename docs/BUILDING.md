@@ -68,6 +68,17 @@ Never commit a keystore, its passwords, or `export_credentials.cfg`.
 - **Version:** `application/short_version` and `application/version` in the `iOS` preset; keep them equal to the Android preset's `version/name` and `version/code`.
 - **Export method:** `IPA_METHOD=debugging` (default with a free personal team), `release-testing` (Ad Hoc) or `app-store-connect` (default with a paid team). A free personal team only allows `debugging`: the IPA installs on your own registered devices and stops opening after 7 days. Ad Hoc, TestFlight and the App Store need the paid Apple Developer Program.
 
+## Desktop releases
+
+Release desktop builds use the same naming as the APKs:
+
+| Command | Output |
+| --- | --- |
+| `make dmg` | `builds/macos/paper-plastic-pew-v<version>-<code>-release.dmg` (universal `.app`, ad-hoc signed) |
+| `make exe` | `builds/windows/paper-plastic-pew-v<version>-<code>-release.exe` (x86_64, embedded `.pck`) |
+
+The macOS preset's `application/short_version` and `application/version` must be `<version>` and `<code>`, and the Windows preset's `application/file_version` and `application/product_version` `<version>.<code>` (Windows versions have four numbers); `make dmg` and `make exe` stop when they differ from the Android preset. There is no Developer ID or notarization, so another Mac opens the `.dmg` app the first time with right-click → Open. Linux packages are not produced yet.
+
 ## Other platforms
 
 These use fixed, unversioned names:
